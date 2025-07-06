@@ -10,9 +10,6 @@ const customerSchemaValidation = z.object({
     contactNumber: z
       .string()
       .min(11, 'Contact number must be at least 11 digits'),
-    emergencyContact: z
-      .string()
-      .min(11, 'Emergency contact must be at least 11 digits'),
     address: z.string().min(1, 'Address is required'),
   }),
 })

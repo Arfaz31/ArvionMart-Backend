@@ -23,17 +23,7 @@ const customerSchema = new Schema<ICustomer>(
       required: true,
       unique: true,
     },
-    gender: {
-      type: String,
-      enum: ['male', 'female'],
-    },
-    emergencyContact: {
-      type: String,
-      required: true,
-    },
-    dateOfBirth: {
-      type: String,
-    },
+
     profileImage: {
       type: String,
     },

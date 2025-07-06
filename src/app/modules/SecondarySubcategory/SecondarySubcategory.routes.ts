@@ -24,7 +24,7 @@ router.get(
 
 router.post(
   '/create',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   validateData(
     SecondarySubcategoryValidation.SecondarySubcategorySchemaValidation
   ),
