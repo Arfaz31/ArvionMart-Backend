@@ -216,6 +216,8 @@ const registerVendor = async (password: string, payload: IVendor) => {
 
     await session.commitTransaction()
     await session.endSession()
+
+    return createdVendor
   } catch (error: any) {
     await session.abortTransaction()
     await session.endSession()

@@ -16,7 +16,7 @@ router.get(
 
 router.post(
   '/create-brand',
-  auth(UserRole.admin, UserRole.superAdmin, UserRole.vendor),
+  // auth(UserRole.admin, UserRole.superAdmin, UserRole.vendor),
   updloadSingleImage('brand-Image'),
   validateRequestedFileData(BrandValidation.BrandValidationSchema),
   BrandController.createBrandIntoDB

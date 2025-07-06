@@ -12,14 +12,14 @@ import { jwtHelper } from '../../utils/jwtHelper'
 
 //login
 const loginUser = async (payload: IAuth) => {
-  const { contactNumber, password } = payload
-  const user = await User.findOne({ contactNumber })
+  const { email, password } = payload
+  const user = await User.findOne({ email })
   if (!user) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid phone or password')
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid email or password')
   }
   const comparePassword = await bcrypt.compare(password, user.password)
   if (!comparePassword) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid phone or password')
+    throw new AppError(httpStatus.BAD_REQUEST, 'Password does not match')
   }
 
   const jwtPayload = {

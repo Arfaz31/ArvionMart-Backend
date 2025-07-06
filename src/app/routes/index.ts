@@ -12,7 +12,7 @@ import { BannerRoutes } from '../modules/Banner/banner.routes'
 import { PromotionalBannerRoutes } from '../modules/PromotionalBanner/promotionalBanner.routes'
 import { SecondarySubcategoryRoutes } from '../modules/SecondarySubcategory/SecondarySubcategory.routes'
 import { PaymentRoutes } from '../modules/Payment/payment.routes'
-import { PromoBannerRoutes } from '../modules/PromoBanner/promoBanner.routes'
+import { PromoBannerRoutes } from '../modules/PromoCard/promoCard.routes'
 import { ReviewRoutes } from '../modules/Review/review.routes'
 
 const middlewareRoutes = Router()
@@ -75,7 +75,7 @@ const router = [
     routes: PaymentRoutes,
   },
   {
-    path: '/promo-banner',
+    path: '/promo-card',
     routes: PromoBannerRoutes,
   },
 ]

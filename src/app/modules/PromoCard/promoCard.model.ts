@@ -1,12 +1,12 @@
-import { Schema } from 'mongoose'
-import { model } from 'mongoose'
-import { IBanner } from './banner.interface'
+import mongoose, { Schema, Document, model } from 'mongoose'
+import { IPromoBanner } from './promoCard.interface'
 
-const BannerSchema = new Schema<IBanner>(
+const PromoBannerSchema = new Schema<IPromoBanner>(
   {
-    image: {
+    bannerImage: {
       type: String,
-      required: [true, 'Image URL is required'],
+      required: true,
+      trim: true,
     },
     categoryId: {
       type: Schema.Types.ObjectId,
@@ -28,14 +28,10 @@ const BannerSchema = new Schema<IBanner>(
       ref: 'Product',
       required: false,
     },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
   },
   {
     timestamps: true,
   }
 )
 
-export const Banner = model<IBanner>('Banner', BannerSchema)
+export const PromoBanner = model<IPromoBanner>('PromoBanner', PromoBannerSchema)

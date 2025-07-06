@@ -4,7 +4,6 @@ import QueryBuilder from '../../builder/QueryBuilder'
 import { searchableFields } from './category.constant'
 import { Product } from '../Product/product.model'
 import { Subcategory } from '../Subcategory/subcategory.model'
-import mongoose from 'mongoose'
 
 const createCategory = async (req: Request) => {
   const payload = req.body

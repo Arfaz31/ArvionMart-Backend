@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
-const bannerSchemaValidation = z.object({
+const PromoBannerSchema = z.object({
   categoryId: z.string().optional(),
   subcategoryId: z.string().optional(),
   secondarySubcategoryId: z.string().optional(),
   productId: z.string().optional(),
 })
 
-export const BannerValidation = {
-  bannerSchemaValidation,
+export const PromoBannerValidation = {
+  PromoBannerSchema,
 }

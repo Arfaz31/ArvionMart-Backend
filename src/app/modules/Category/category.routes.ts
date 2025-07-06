@@ -15,7 +15,7 @@ router.get('/all-category', CategoryController.getAllCategory)
 
 router.post(
   '/create-category',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   updloadSingleImage('category-Image'),
   validateRequestedFileData(CategoryValidation.CategoryValidationSchema),
   CategoryController.createCategoryIntoDB

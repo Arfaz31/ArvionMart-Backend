@@ -10,7 +10,7 @@ const router = Router()
 
 router.post(
   '/create-banner',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   updloadSingleImage('banner-image'),
   validateRequestedFileData(BannerValidation.bannerSchemaValidation),
   BannerController.createBannerIntoDB

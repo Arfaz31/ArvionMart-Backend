@@ -18,7 +18,7 @@ router.get(
 
 router.post(
   '/create-subcategory',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   updloadSingleImage('subcategory-Image'),
   validateRequestedFileData(SubcategoryValidation.SubCategoryValidationSchema),
   SubcategoryController.createSubCategoryIntoDB
