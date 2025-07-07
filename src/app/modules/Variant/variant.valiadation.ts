@@ -42,6 +42,9 @@ const CreatedVariantSchema = z.object({
   productSKU: z.string({
     required_error: 'Product SKU is required',
   }),
+  unit: z.string({
+    required_error: 'Unit is required',
+  }),
 })
 
 const updateVariantSchema = z.object({
@@ -57,6 +60,7 @@ const updateVariantSchema = z.object({
   discount: z.number().min(0, 'Discount cannot be negative').optional(),
   productId: z.string().optional(),
   productSKU: z.string().optional(),
+  unit: z.string().optional(),
 })
 
 export const VariantValidation = {

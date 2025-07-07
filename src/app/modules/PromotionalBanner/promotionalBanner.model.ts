@@ -5,23 +5,33 @@ const PromotionalBannerSchema = new Schema<IPromotionalBanner>(
   {
     image: {
       type: String,
-      required: [true, 'Image URL is required'],
+      required: true,
+      trim: true,
     },
-    title: {
-      type: String,
-      required: [true, 'Title is required'],
-      minlength: [1, 'Title must not be empty'],
+    categoryId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: false,
     },
-    subtitle: {
-      type: String,
-      required: [true, 'Subtitle is required'],
-      minlength: [1, 'Subtitle must not be empty'],
+    subcategoryId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Subcategory',
+      required: false,
     },
-    discount: {
-      type: Number,
-      required: [true, 'Discount is required'],
-      min: [0, 'Discount cannot be negative'],
-      max: [100, 'Discount cannot exceed 100%'],
+    secondarySubcategoryId: {
+      type: Schema.Types.ObjectId,
+      ref: 'SecondarySubcategory',
+      required: false,
+    },
+    productId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Product',
+      required: false,
+    },
+    brandId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Brand',
+      required: false,
     },
     isDeleted: {
       type: Boolean,

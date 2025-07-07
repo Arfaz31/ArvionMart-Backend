@@ -6,4 +6,5 @@ export interface IPromoBanner {
   subcategoryId?: Types.ObjectId
   secondarySubcategoryId?: Types.ObjectId
   productId?: Types.ObjectId
+  isDeleted?: boolean
 }

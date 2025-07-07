@@ -81,6 +81,11 @@ const getAllProducts = async (query: Record<string, unknown>) => {
     variantQuery.color = { $regex: String(query.color), $options: 'i' }
   }
 
+  if (query.isNewArrival !== undefined) {
+    filters.isNewArrival =
+      query.isNewArrival === 'true' || query.isNewArrival === true
+  }
+
   if (query.size) {
     const sizeValues = Array.isArray(query.size)
       ? query.size.map(String)

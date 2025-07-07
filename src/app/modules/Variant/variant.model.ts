@@ -53,6 +53,10 @@ const VariantSchema = new Schema<IVariant>(
       type: String,
       required: true,
     },
+    unit: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 )
