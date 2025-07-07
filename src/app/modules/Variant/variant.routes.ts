@@ -10,7 +10,7 @@ const router = express.Router()
 
 router.post(
   '/create-variant',
-  auth(UserRole.superAdmin, UserRole.admin),
+  // auth(UserRole.superAdmin, UserRole.admin),
   uploadMultipleImages([{ name: 'variant-Image', maxCount: 10 }]),
   validateRequestedFileData(VariantValidation.CreatedVariantSchema),
   VariantController.createVariant

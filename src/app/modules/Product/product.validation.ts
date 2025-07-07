@@ -2,14 +2,6 @@ import { z } from 'zod'
 
 const productSchemaValidation = z.object({
   productName: z.string().min(1, 'Product name is required').trim(),
-  // slug: z
-  //   .string()
-  //   .min(1, 'Slug is required')
-  //   .trim()
-  //   .toLowerCase()
-  //   .refine(slug => !slug.includes(' '), {
-  //     message: 'Slug cannot contain spaces',
-  //   }),
   description: z
     .string()
     .min(10, 'Description should be at least 10 characters')
@@ -18,10 +10,6 @@ const productSchemaValidation = z.object({
   category: z.string().optional(),
   subcategory: z.string().optional(),
   secondarySubcategory: z.string().optional(),
-  // vendor: z.string({
-  //   required_error: 'Vendor is required',
-  // }),
-
   stock: z
     .number()
     .int('Stock must be an integer')

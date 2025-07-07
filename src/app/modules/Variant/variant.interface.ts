@@ -16,4 +16,5 @@ export interface IVariant {
   image?: string[]
   productId: Types.ObjectId
   productSKU: string
+  unit: string
 }

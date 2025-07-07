@@ -14,6 +14,7 @@ import { SecondarySubcategoryRoutes } from '../modules/SecondarySubcategory/Seco
 import { PaymentRoutes } from '../modules/Payment/payment.routes'
 import { PromoBannerRoutes } from '../modules/PromoCard/promoCard.routes'
 import { ReviewRoutes } from '../modules/Review/review.routes'
+import { BrandOfferRoutes } from '../modules/TopBrandsAndOffers/topBrandAndOffers.route'
 
 const middlewareRoutes = Router()
 
@@ -77,6 +78,10 @@ const router = [
   {
     path: '/promo-card',
     routes: PromoBannerRoutes,
+  },
+  {
+    path: '/brand-offer-card',
+    routes: BrandOfferRoutes,
   },
 ]
 

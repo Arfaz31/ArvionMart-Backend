@@ -28,6 +28,10 @@ const PromoBannerSchema = new Schema<IPromoBanner>(
       ref: 'Product',
       required: false,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

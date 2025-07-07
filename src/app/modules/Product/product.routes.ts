@@ -59,7 +59,7 @@ router.get(
 
 router.post(
   '/create-product',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   validateData(ProductValidation.productSchemaValidation),
   ProductController.createProduct
 )

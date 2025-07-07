@@ -9,8 +9,8 @@ import { updloadSingleImage } from '../../config/cloudinary/multer.config'
 const router = Router()
 
 router.post(
-  '/create-promotion-banner',
-  auth(UserRole.admin, UserRole.superAdmin),
+  '/create-promotional-banner',
+  // auth(UserRole.admin, UserRole.superAdmin),
   updloadSingleImage('promobanner-image'),
   validateRequestedFileData(
     PromotionalBannerValidation.PromotionalBannerSchema
