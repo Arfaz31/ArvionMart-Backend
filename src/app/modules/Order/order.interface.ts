@@ -9,11 +9,13 @@ export type TOrderItem = {
   category: string
   brand?: string
   discount?: number
+  purchasePrice: number
   sellingPrice: number
   variant: Types.ObjectId
   size?: string
   color?: string
   quantity: number
+  image?: string
 }
 
 export type TCustomerInfo = {

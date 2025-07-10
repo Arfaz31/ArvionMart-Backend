@@ -14,6 +14,8 @@ const createReviewIntoDB = catchAsync(async (req, res) => {
 
 const getReviewsByProduct = catchAsync(async (req, res) => {
   const productId = req.params.productId
+  // console.log('productId', productId)
+
   const result = await ReviewService.getReviewsByProduct(productId)
   sendResponse(res, {
     statusCode: httpStatus.OK,

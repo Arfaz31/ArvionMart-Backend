@@ -15,6 +15,7 @@ const OrderItemValidationSchema = z.object({
   size: z.string().optional(),
   color: z.string().optional(),
   quantity: z.number().int().positive(),
+  image: z.string().optional(),
 })
 
 // Validate customer info

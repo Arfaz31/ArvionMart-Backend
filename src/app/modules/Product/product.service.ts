@@ -456,6 +456,26 @@ const getTotalProductCount = async (req: Request) => {
   return result
 }
 
+const getCategoryRelatedProductsFromDB = async (excludeProductId: string) => {
+  const product = await Product.findById(excludeProductId)
+
+  if (!product) {
+    throw new Error('product not found')
+  }
+
+  const relatedProducts = await Product.find({
+    category: product.category,
+    _id: { $ne: excludeProductId },
+  })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('variant')
+  // Find all products with the same category ID, except for the product with this specific ID.
+
+  return relatedProducts
+}
+
 export const ProductService = {
   createProductIntoDB,
   getAllProducts,
@@ -468,4 +488,5 @@ export const ProductService = {
   // getProductByVendor,
   getLastProduct,
   getTotalProductCount,
+  getCategoryRelatedProductsFromDB,
 }
