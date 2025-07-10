@@ -28,6 +28,18 @@ router.get(
 )
 
 router.get(
+  '/product-count',
+  auth(...Object.values(UserRole)),
+  ProductController.getProductsCountByVendor
+)
+
+router.get(
+  '/last-product',
+  auth(...Object.values(UserRole)),
+  ProductController.getLastProduct
+)
+
+router.get(
   '/category/:categoryId',
   // auth(...Object.values(UserRole)),
   ProductController.getProductsByCategory
@@ -39,22 +51,10 @@ router.get(
   ProductController.getProductsByBrand
 )
 
-// router.get(
-//   '/vendor/product',
-//   auth(UserRole.vendor),
-//   ProductController.getProductByVendor
-// )
-
 router.get(
-  '/product-count',
-  auth(...Object.values(UserRole)),
-  ProductController.getProductsCountByVendor
-)
-
-router.get(
-  '/last-product',
-  auth(...Object.values(UserRole)),
-  ProductController.getLastProduct
+  '/:id/related',
+  // auth(...Object.values(UserRole)),
+  ProductController.getCategoryRelatedProducts
 )
 
 router.post(

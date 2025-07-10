@@ -108,6 +108,22 @@ const getProductsCountByVendor = catchAsync(async (req, res) => {
   })
 })
 
+const getCategoryRelatedProducts = catchAsync(async (req, res) => {
+  const { id } = req.params
+
+  const relatedProducts = await ProductService.getCategoryRelatedProductsFromDB(
+    id
+  )
+  // the id (which is the ID of the product itself).
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Related products retrieved successfully',
+    data: relatedProducts,
+  })
+})
+
 export const ProductController = {
   createProduct,
   getAllProducts,
@@ -120,4 +136,5 @@ export const ProductController = {
   // getProductByVendor,
   getLastProduct,
   getProductsCountByVendor,
+  getCategoryRelatedProducts,
 }
