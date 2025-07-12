@@ -17,22 +17,22 @@ router.get(
 router.post(
   '/create-brand',
   // auth(UserRole.admin, UserRole.superAdmin, UserRole.vendor),
-  updloadSingleImage('brand-Image'),
+  updloadSingleImage('brandImage'),
   validateRequestedFileData(BrandValidation.BrandValidationSchema),
   BrandController.createBrandIntoDB
 )
 
 router.patch(
   '/:id',
-  auth(UserRole.admin, UserRole.superAdmin, UserRole.vendor),
-  updloadSingleImage('brand-Image'),
+  // auth(UserRole.admin, UserRole.superAdmin, UserRole.vendor),
+  updloadSingleImage('brandImage'),
   validateRequestedFileData(BrandValidation.UpdateBrnadValidationSchema),
   BrandController.updateBrandIntoDB
 )
 
 router.delete(
   '/:id',
-  auth(UserRole.admin, UserRole.superAdmin, UserRole.vendor),
+  // auth(UserRole.admin, UserRole.superAdmin, UserRole.vendor),
   BrandController.deleteBrand
 )
 
