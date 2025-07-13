@@ -3,8 +3,6 @@ import { Types } from 'mongoose'
 export interface IProduct {
   productName: string
   sku: string
-  // slug: string
-  // vendor: Types.ObjectId
   description: string
   brand?: Types.ObjectId
   category?: Types.ObjectId
