@@ -13,18 +13,7 @@ const ProductSchema = new Schema<IProduct>(
       required: [true, 'Product name is required'],
       trim: true,
     },
-    // slug: {
-    //   type: String,
-    //   required: [true, 'Slug is required'],
-    //   unique: true,
-    //   trim: true,
-    //   lowercase: true,
-    // },
-    // vendor: {
-    //   type: Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: 'Vendor',
-    // },
+
     description: {
       type: String,
       required: [true, 'Description is required'],

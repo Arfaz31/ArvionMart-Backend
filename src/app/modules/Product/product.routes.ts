@@ -66,15 +66,15 @@ router.post(
 
 router.patch(
   '/update/:id',
-  auth(UserRole.admin, UserRole.superAdmin),
-  // updloadSingleImage('product-Image'),
+  // auth(UserRole.admin, UserRole.superAdmin),
+
   validateRequestedFileData(ProductValidation.updateProductSchemaValidation),
   ProductController.updateProductIntoDB
 )
 
 router.delete(
   '/delete/:id',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   ProductController.deleteProduct
 )
 

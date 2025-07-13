@@ -11,7 +11,7 @@ const router = express.Router()
 router.post(
   '/create-variant',
   // auth(UserRole.superAdmin, UserRole.admin),
-  uploadMultipleImages([{ name: 'variant-Image', maxCount: 10 }]),
+  uploadMultipleImages([{ name: 'variant-images', maxCount: 10 }]),
   validateRequestedFileData(VariantValidation.CreatedVariantSchema),
   VariantController.createVariant
 )
@@ -36,8 +36,8 @@ router.get(
 
 router.patch(
   '/update/:id',
-  auth(UserRole.superAdmin, UserRole.admin),
-  uploadMultipleImages([{ name: 'variant-image', maxCount: 10 }]),
+  // auth(UserRole.superAdmin, UserRole.admin),
+  uploadMultipleImages([{ name: 'variant-images', maxCount: 10 }]),
   validateRequestedFileData(VariantValidation.updateVariantSchema),
   VariantController.updateVariant
 )
