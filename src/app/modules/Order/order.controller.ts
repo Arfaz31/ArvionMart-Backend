@@ -12,13 +12,36 @@ const createOrderIntoDB = catchAsync(async (req, res) => {
   })
 })
 
-const getOrderFromBD = catchAsync(async (req, res) => {
-  const result = await OrderService.getOrders(req.query)
+// const getOrderFromBD = catchAsync(async (req, res) => {
+//   const result = await OrderService.getOrders(req.query)
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     message: 'Order get successfully',
+//     meta: result.count,
+//     data: result.result,
+//   })
+// })
+
+const getAllOrdersInfoFromBD = catchAsync(async (req, res) => {
+  const result = await OrderService.getAllOrdersInfo(req.query)
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Order get successfully',
-    meta: result.count,
-    data: result.result,
+    meta: result.meta,
+    data: {
+      pendingOrderData: result.pendingOrderData,
+      shippedOrderData: result.shippedOrderData,
+      deliveredOrderData: result.deliveredOrderData,
+      cancelledOrderData: result.cancelledOrderData,
+      totalOrderCount: result.totalOrderCount,
+      totalPendingOrderCount: result.totalPendingOrderCount,
+      totalShippedOrderCount: result.totalShippedOrderCount,
+      totalDeliveredOrderCount: result.totalDeliveredOrderCount,
+      totalCancelledOrderCount: result.totalCancelledOrderCount,
+      totalSales: result.totalSales,
+      totalProfit: result.totalProfit,
+    },
   })
 })
 
@@ -107,13 +130,27 @@ const getReports = catchAsync(async (req, res) => {
   })
 })
 
+const updateOrder = catchAsync(async (req, res) => {
+  const orderId = req.params.id
+  const updatePayload = req.body
+
+  const updatedOrder = await OrderService.updateOrder(orderId, updatePayload)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Order updated successfully',
+    data: updatedOrder,
+  })
+})
+
 export const OrderController = {
   createOrderIntoDB,
-  getOrderFromBD,
+  getAllOrdersInfoFromBD,
   updateOrderDeliverStatus,
   getMyOrders,
   getSingleOrder,
   requestCancelOrder,
   reviewCancelRequest,
   getReports,
+  updateOrder,
 }

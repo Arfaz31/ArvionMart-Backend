@@ -82,43 +82,109 @@ const createOrder = async (payload: IOrder) => {
   }
 }
 
-const getOrders = async (query: Record<string, unknown>) => {
-  const result = await new QueryBuilder(Order.find(), query)
-    .search(searchableFields)
-    .filter()
-    .sort()
-    .pagination()
-    .fields().modelQuery
-  const count = await new QueryBuilder(Order.find(), query).countTotal()
-  return {
-    count,
-    result,
-  }
-}
-
-//get order from the cusotmer
-// const getOrderCustomerFromDB = async (req: Request) => {
-//   const user = req.user
-
-//   const builderQuery = await new QueryBuilder(
-//     Order.find({ customerId: user._id }),
-//     req.query
-//   )
-//     .search(['orderNumber', 'customerName', 'email'])
+// const getOrders = async (query: Record<string, unknown>) => {
+//   const result = await new QueryBuilder(Order.find(), query)
+//     .search(searchableFields)
 //     .filter()
 //     .sort()
 //     .pagination()
 //     .fields().modelQuery
-
-//   const count = await new QueryBuilder(
-//     Order.find({ customerId: user._id }),
-//     req.query
-//   ).countTotal()
+//   const count = await new QueryBuilder(Order.find(), query).countTotal()
 //   return {
 //     count,
-//     builderQuery,
+//     result,
 //   }
 // }
+
+const getAllOrdersInfo = async (query: Record<string, unknown>) => {
+  const fromDate = query.fromDate as string
+  const toDate = query.toDate as string
+  const orderStatus = query.orderStatus as string
+
+  // Build a filter for QueryBuilder + raw filtering later
+  const rawFilter: Record<string, any> = {}
+
+  // Date range filter
+  if (fromDate || toDate) {
+    rawFilter.createdAt = {}
+    if (fromDate) rawFilter.createdAt.$gte = new Date(fromDate)
+    if (toDate) rawFilter.createdAt.$lte = new Date(toDate)
+  }
+
+  // Order status filter
+  if (orderStatus) {
+    rawFilter.orderStatus = orderStatus
+  }
+
+  // Combine into query
+  const initialQuery = Order.find({ ...rawFilter })
+
+  const builder = new QueryBuilder(initialQuery, query)
+    .search(searchableFields)
+    .filter()
+    .sort()
+    .pagination()
+    .fields()
+
+  const orders = await builder.modelQuery
+  const count = await new QueryBuilder(
+    Order.find({ ...rawFilter }),
+    query
+  ).countTotal()
+
+  // Grouping and counting
+  const pendingOrderData = orders.filter(
+    order => order.orderStatus === 'PENDING' && order.cancelledRequest === false
+  )
+  const shippedOrderData = orders.filter(
+    order => order.orderStatus === 'SHIPPED'
+  )
+  const deliveredOrderData = orders.filter(
+    order => order.orderStatus === 'DELIVERED'
+  )
+  const cancelledOrderData = orders.filter(
+    order => order.orderStatus === 'CANCELLED'
+  )
+
+  const totalOrderCount = orders.length
+  const totalPendingOrderCount = pendingOrderData.length
+  const totalShippedOrderCount = shippedOrderData.length
+  const totalDeliveredOrderCount = deliveredOrderData.length
+  const totalCancelledOrderCount = cancelledOrderData.length
+
+  // Total sales from delivered + paid
+  const deliveredAndPaidOrders = deliveredOrderData.filter(
+    order => order.isPaid
+  )
+  const totalSales = deliveredAndPaidOrders.reduce(
+    (sum, order) => sum + order.totalPrice,
+    0
+  )
+
+  // Total profit
+  const totalProfit = deliveredAndPaidOrders.reduce((acc, order) => {
+    const cost = order.orderItems.reduce(
+      (sum, item) => sum + item.purchasePrice * item.quantity,
+      0
+    )
+    return acc + (order.totalPrice - cost)
+  }, 0)
+
+  return {
+    meta: count,
+    pendingOrderData,
+    shippedOrderData,
+    deliveredOrderData,
+    cancelledOrderData,
+    totalOrderCount,
+    totalPendingOrderCount,
+    totalShippedOrderCount,
+    totalDeliveredOrderCount,
+    totalCancelledOrderCount,
+    totalSales,
+    totalProfit,
+  }
+}
 
 export const getMyOrders = async (userId: string) => {
   const orders = await Order.find({ 'customerInfo.customerId': userId }).sort({
@@ -250,13 +316,31 @@ const getReports = async () => {
   }
 }
 
+const updateOrder = async (orderId: string, updatePayload: Partial<IOrder>) => {
+  const order = await Order.findById(orderId)
+  if (!order) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Order not found')
+  }
+
+  // Only update fields that exist in updatePayload
+  Object.entries(updatePayload).forEach(([key, value]) => {
+    if (value !== undefined && key in order) {
+      ;(order as any)[key] = value
+    }
+  })
+
+  await order.save()
+  return order
+}
+
 export const OrderService = {
   createOrder,
-  getOrders,
+  getAllOrdersInfo,
   getMyOrders,
   getSingleOrder,
   updateDeliverStatus,
   requestCancelOrder,
   reviewCancelRequest,
   getReports,
+  updateOrder,
 }
