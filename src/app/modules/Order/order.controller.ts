@@ -120,6 +120,17 @@ const reviewCancelRequest = catchAsync(async (req, res) => {
   })
 })
 
+const getCancelRequestOrderData = catchAsync(async (req, res) => {
+  const result = await OrderService.getCancelRequestOrderData(req.query)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Cancelled request orders fetched successfully',
+    meta: result.count,
+    data: result.result,
+  })
+})
+
 const getReports = catchAsync(async (req, res) => {
   const reportData = await OrderService.getReports()
 
@@ -151,6 +162,7 @@ export const OrderController = {
   getSingleOrder,
   requestCancelOrder,
   reviewCancelRequest,
+  getCancelRequestOrderData,
   getReports,
   updateOrder,
 }
