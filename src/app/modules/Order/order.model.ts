@@ -171,6 +171,9 @@ const orderSchema = new Schema<IOrder>(
     noteFromAdmin: {
       type: String,
     },
+    noteFromCustomer: {
+      type: String,
+    },
   },
   { timestamps: true }
 )

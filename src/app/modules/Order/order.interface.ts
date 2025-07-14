@@ -47,4 +47,5 @@ export interface IOrder {
   cancelledDate?: Date
   cancelledReason?: string
   noteFromAdmin?: string
+  noteFromCustomer?: string
 }
