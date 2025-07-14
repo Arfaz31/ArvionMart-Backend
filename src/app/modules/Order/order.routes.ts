@@ -27,6 +27,8 @@ router.get(
   OrderController.getMyOrders
 )
 
+router.get('/cancel-requests', OrderController.getCancelRequestOrderData)
+
 router.get(
   '/my-orders/:id',
   // auth(UserRole.superAdmin, UserRole.admin, UserRole.customer),

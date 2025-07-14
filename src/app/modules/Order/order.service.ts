@@ -281,6 +281,27 @@ const reviewCancelRequest = async (
   return order
 }
 
+const getCancelRequestOrderData = async (query: Record<string, unknown>) => {
+  const initialQuery = Order.find({ cancelledRequest: true })
+
+  const result = await new QueryBuilder(initialQuery, query)
+    .search(searchableFields)
+    .filter()
+    .sort()
+    .pagination()
+    .fields().modelQuery
+
+  const count = await new QueryBuilder(
+    Order.find({ cancelledRequest: true }),
+    query
+  ).countTotal()
+
+  return {
+    count,
+    result,
+  }
+}
+
 const getReports = async () => {
   // Total orders (excluding cancelled)
   const totalOrderCount = await Order.countDocuments({
@@ -341,6 +362,7 @@ export const OrderService = {
   updateDeliverStatus,
   requestCancelOrder,
   reviewCancelRequest,
+  getCancelRequestOrderData,
   getReports,
   updateOrder,
 }
