@@ -23,8 +23,7 @@ const register = catchAsync(async (req, res) => {
 })
 
 const createAdminIntoDB = catchAsync(async (req, res) => {
-  const { password, admin } = req.body
-  const result = await UserSercive.createAdmin(password, admin)
+  const result = await UserSercive.createAdmin(req.body)
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     message: 'Admin created successfully',

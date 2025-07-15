@@ -12,15 +12,22 @@ const createOrderIntoDB = catchAsync(async (req, res) => {
   })
 })
 
-// const getOrderFromBD = catchAsync(async (req, res) => {
-//   const result = await OrderService.getOrders(req.query)
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     message: 'Order get successfully',
-//     meta: result.count,
-//     data: result.result,
-//   })
-// })
+const createOrderByAdminIntoDB = catchAsync(async (req, res) => {
+  const { password, customer, order } = req.body
+  const result = await OrderService.createOrderByAdmin(
+    password,
+    customer,
+    order
+  )
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Order created successfully by admin',
+    data: result,
+  })
+})
+
+
 
 const getAllOrdersInfoFromBD = catchAsync(async (req, res) => {
   const result = await OrderService.getAllOrdersInfo(req.query)
@@ -56,16 +63,6 @@ const updateOrderDeliverStatus = catchAsync(async (req, res) => {
   })
 })
 
-// get customer data
-// const getCustomerOrder = catchAsync(async (req, res) => {
-//   const result = await OrderService.getOrderCustomerFromDB(req)
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     message: 'Customer order get successfully',
-//     meta: result.count,
-//     data: result.builderQuery,
-//   })
-// })
 
 const getMyOrders = catchAsync(async (req, res) => {
   const userId = req.user._id
@@ -146,13 +143,13 @@ const updateOrder = catchAsync(async (req, res) => {
 
 export const OrderController = {
   createOrderIntoDB,
+  createOrderByAdminIntoDB,
   getAllOrdersInfoFromBD,
-  updateOrderDeliverStatus,
   getMyOrders,
   getSingleOrder,
   requestCancelOrder,
   reviewCancelRequest,
   getCancelRequestOrderData,
-
   updateOrder,
+  updateOrderDeliverStatus
 }

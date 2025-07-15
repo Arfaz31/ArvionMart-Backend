@@ -9,6 +9,12 @@ import { Variant } from '../Variant/variant.model'
 import { generateOrderNumber, generateTransactionId } from './order.utility'
 import { AppError } from '../../Error/AppError'
 import httpStatus from 'http-status'
+import { ICustomer } from '../Customers/customers.interface'
+import { generateUserId } from '../User/user.service'
+import { IUser } from '../User/user.interface'
+import { UserRole } from '../User/user.contant'
+import { User } from '../User/user.model'
+import { Customers } from '../Customers/customers.model'
 
 const createOrder = async (payload: IOrder) => {
   const session = await mongoose.startSession()
@@ -72,6 +78,113 @@ const createOrder = async (payload: IOrder) => {
     }
 
     // Step 6: Commit transaction
+    await session.commitTransaction()
+    return order
+  } catch (error) {
+    await session.abortTransaction()
+    throw error
+  } finally {
+    session.endSession()
+  }
+}
+
+const createOrderByAdmin = async (
+  password: string,
+  customerPayload: ICustomer,
+  orderPayload: IOrder
+) => {
+  const userId = generateUserId(customerPayload.fullName)
+  orderPayload.transactionId = generateTransactionId()
+  orderPayload.orderNumber = generateOrderNumber()
+
+  const userData: Partial<IUser> = {
+    userId,
+    email: customerPayload.email,
+    contactNumber: customerPayload.contactNumber,
+    password,
+    role: UserRole.customer,
+  }
+
+  const session = await mongoose.startSession()
+  session.startTransaction()
+
+  try {
+    // Step 1: Create User
+    const [createdUser] = await User.create([userData], { session })
+
+    if (!createdUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'User creation failed')
+    }
+
+    // Step 2: Create Customer
+    customerPayload.user = createdUser._id
+    const [createdCustomer] = await Customers.create([customerPayload], {
+      session,
+    })
+
+    if (!createdCustomer) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Customer creation failed')
+    }
+
+    // Step 3: Create Order
+    const [order] = await Order.create([orderPayload], { session })
+
+    // Step 4: Update Stock
+    for (const item of orderPayload.orderItems) {
+      const variant = await Variant.findById(item.variant).session(session)
+      const product = await Product.findById(item.productId).session(session)
+
+      if (!variant || !product) {
+        throw new AppError(
+          httpStatus.NOT_FOUND,
+          `Product or variant not found for productId: ${item.productId}`
+        )
+      }
+
+      // Handle size-based reduction
+      if (item.size) {
+        const sizeEntry = variant.size?.find(s => s.size === item.size)
+        if (!sizeEntry) {
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            `Size "${item.size}" not found in variant ${variant._id}`
+          )
+        }
+
+        if (sizeEntry.quantity < item.quantity) {
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            `Insufficient stock for size "${item.size}" in variant ${variant._id}`
+          )
+        }
+
+        sizeEntry.quantity -= item.quantity
+      } else {
+        // Simple quantity reduction
+        if ((variant.quantity ?? 0) < item.quantity) {
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            `Insufficient variant quantity for variant ${variant._id}`
+          )
+        }
+
+        variant.quantity = (variant.quantity ?? 0) - item.quantity
+      }
+
+      // Update product quantity
+      if ((product.quantity ?? 0) < item.quantity) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          `Insufficient product stock for ${product.productName}`
+        )
+      }
+
+      product.quantity = (product.quantity ?? 0) - item.quantity
+
+      await variant.save({ session })
+      await product.save({ session })
+    }
+
     await session.commitTransaction()
     return order
   } catch (error) {
@@ -307,6 +420,7 @@ const updateOrder = async (orderId: string, updatePayload: Partial<IOrder>) => {
 
 export const OrderService = {
   createOrder,
+  createOrderByAdmin,
   getAllOrdersInfo,
   getMyOrders,
   getSingleOrder,

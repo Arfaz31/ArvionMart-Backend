@@ -37,6 +37,8 @@ router.post(
   OrderController.createOrderIntoDB
 )
 
+router.post('/create-order-by-admin', OrderController.createOrderByAdminIntoDB)
+
 router.patch(
   '/update-deliver-status/:id',
   // auth(UserRole.superAdmin, UserRole.admin, UserRole.vendor),

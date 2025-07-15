@@ -9,6 +9,7 @@ import { resetHtmlBody } from '../../view/resetPassword'
 import { Customers } from '../Customers/customers.model'
 import config from '../../config'
 import { jwtHelper } from '../../utils/jwtHelper'
+import { UserRole } from '../User/user.contant'
 
 //login
 const loginUser = async (payload: IAuth) => {
@@ -215,10 +216,72 @@ const resetPassword = async (
   )
 }
 
+const updatePasswordForStaff = async (payload: any, user: any) => {
+  const { id: targetUserId, newPassword } = payload
+  const currentUser = user
+
+  if (!targetUserId || !newPassword) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Missing required fields')
+  }
+
+  const targetUser = await User.findById(targetUserId)
+  if (!targetUser) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Target user not found')
+  }
+
+  const requesterRole = currentUser.role
+  const requesterId = currentUser._id.toString()
+  const targetRole = targetUser.role
+  const targetId = targetUser._id.toString()
+
+  // Authorization rules
+  if (requesterRole === UserRole.superAdmin) {
+    // superAdmin can update any user's password
+  } else if (requesterRole === UserRole.admin) {
+    // admin can update only customer passwords
+    if (targetRole !== UserRole.customer) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        'Admin can only update customer passwords'
+      )
+    }
+  } else if (requesterRole === UserRole.customer) {
+    // customer can update only their own password
+    if (requesterId !== targetId) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        'Customers can only update their own password'
+      )
+    }
+  } else {
+    throw new AppError(httpStatus.FORBIDDEN, 'Unauthorized role')
+  }
+
+  // Hash and update password
+  const hashedPassword = await bcrypt.hash(
+    newPassword,
+    Number(config.salt_rounds)
+  )
+
+  await User.findByIdAndUpdate(
+    targetUserId,
+    {
+      password: hashedPassword,
+      passwordChangedAt: new Date(),
+    },
+    { new: true }
+  )
+
+  return {
+    message: 'Password updated successfully',
+  }
+}
+
 export const AuthService = {
   loginUser,
   generateAccessToken,
   forgetPasswordLink,
   resetPassword,
+  updatePasswordForStaff,
   vendorLogin,
 }
