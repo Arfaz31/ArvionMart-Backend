@@ -9,11 +9,6 @@ import {
 import validateData from '../../middleware/validateRequest'
 
 const router = Router()
-router.get(
-  '/reports',
-  // auth(UserRole.admin, UserRole.superAdmin),
-  OrderController.getReports
-)
 
 router.get(
   '/',

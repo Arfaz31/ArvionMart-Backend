@@ -131,16 +131,6 @@ const getCancelRequestOrderData = catchAsync(async (req, res) => {
   })
 })
 
-const getReports = catchAsync(async (req, res) => {
-  const reportData = await OrderService.getReports()
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    message: 'Order report fetched successfully',
-    data: reportData,
-  })
-})
-
 const updateOrder = catchAsync(async (req, res) => {
   const orderId = req.params.id
   const updatePayload = req.body
@@ -163,6 +153,6 @@ export const OrderController = {
   requestCancelOrder,
   reviewCancelRequest,
   getCancelRequestOrderData,
-  getReports,
+
   updateOrder,
 }

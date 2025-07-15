@@ -82,20 +82,6 @@ const createOrder = async (payload: IOrder) => {
   }
 }
 
-// const getOrders = async (query: Record<string, unknown>) => {
-//   const result = await new QueryBuilder(Order.find(), query)
-//     .search(searchableFields)
-//     .filter()
-//     .sort()
-//     .pagination()
-//     .fields().modelQuery
-//   const count = await new QueryBuilder(Order.find(), query).countTotal()
-//   return {
-//     count,
-//     result,
-//   }
-// }
-
 const getAllOrdersInfo = async (query: Record<string, unknown>) => {
   const fromDate = query.fromDate as string
   const toDate = query.toDate as string
@@ -302,41 +288,6 @@ const getCancelRequestOrderData = async (query: Record<string, unknown>) => {
   }
 }
 
-const getReports = async () => {
-  // Total orders (excluding cancelled)
-  const totalOrderCount = await Order.countDocuments({
-    orderStatus: { $ne: 'CANCELLED' },
-  })
-
-  // Total cancelled orders
-  const totalCancelledOrders = await Order.countDocuments({
-    orderStatus: 'CANCELLED',
-  })
-
-  // Total profit from paid orders
-  const paidOrders = await Order.aggregate([
-    {
-      $match: {
-        isPaid: true,
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        totalProfit: { $sum: '$totalPrice' },
-      },
-    },
-  ])
-
-  const totalProfit = paidOrders[0]?.totalProfit || 0
-
-  return {
-    totalOrderCount,
-    totalCancelledOrders,
-    totalProfit,
-  }
-}
-
 const updateOrder = async (orderId: string, updatePayload: Partial<IOrder>) => {
   const order = await Order.findById(orderId)
   if (!order) {
@@ -363,6 +314,6 @@ export const OrderService = {
   requestCancelOrder,
   reviewCancelRequest,
   getCancelRequestOrderData,
-  getReports,
+
   updateOrder,
 }
