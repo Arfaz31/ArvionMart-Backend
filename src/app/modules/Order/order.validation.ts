@@ -55,3 +55,28 @@ export const UpdateOrderValidationSchema = z.object({
   deliveryStatus: z.string().optional(),
   deliveredDate: z.date().optional(),
 })
+
+const AdminCustomerInfoSchema = z.object({
+  fullName: z.string().min(1, 'Full name is required'),
+  email: z.string().email('Invalid email format'),
+  contactNumber: z
+    .string()
+    .regex(/^\+?[0-9]{10,15}$/, 'Invalid contact number'),
+  address: z.string().min(1, 'Address is required'),
+})
+
+// Admin order creation schema
+export const createOrderValidationSchemaForAdmin = z.object({
+  customer: AdminCustomerInfoSchema,
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+
+  order: z.object({
+    customerInfo: CustomerInfoValidationSchema,
+    orderItems: z.array(OrderItemValidationSchema).min(1),
+    paymentMethod: z.string().min(1, 'Payment method is required'),
+    shippingPrice: z.number().min(0),
+    totalPrice: z.number().min(0),
+    transactionId: z.string().optional(),
+    noteFromCustomer: z.string().optional(),
+  }),
+})

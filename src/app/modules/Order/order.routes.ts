@@ -4,6 +4,7 @@ import auth from '../../middleware/auth'
 import { UserRole } from '../User/user.contant'
 import {
   CreateOrderValidationSchema,
+  createOrderValidationSchemaForAdmin,
   UpdateOrderValidationSchema,
 } from './order.validation'
 import validateData from '../../middleware/validateRequest'
@@ -35,6 +36,12 @@ router.post(
   // auth(UserRole.superAdmin, UserRole.admin, UserRole.customer),
   validateData(CreateOrderValidationSchema),
   OrderController.createOrderIntoDB
+)
+
+router.post(
+  '/create-order-by-admin',
+  validateData(createOrderValidationSchemaForAdmin),
+  OrderController.createOrderByAdminIntoDB
 )
 
 router.patch(

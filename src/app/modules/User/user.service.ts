@@ -16,7 +16,7 @@ import { Vendor } from '../Vendor/vendor.model'
 import { IVendor } from '../Vendor/vendor.interface'
 import QueryBuilder from '../../builder/QueryBuilder'
 
-const generateUserId = (name: string): string => {
+export const generateUserId = (name: string): string => {
   const cleanName = name.trim().split(' ').join('').toLowerCase()
   const shortUuid = uuidv4().slice(0, 6) // keep it short & readable
   return `${cleanName}-${shortUuid}`
@@ -93,7 +93,7 @@ const registerUser = async (password: string, payload: ICustomer) => {
 }
 
 //create-admin
-const createAdmin = async (password: string, payload: IAdmin) => {
+const createAdmin = async (payload: any) => {
   const userName = generateUserId(payload.fullName)
 
   const existingUser = await User.findOne({ email: payload.email })
@@ -107,7 +107,7 @@ const createAdmin = async (password: string, payload: IAdmin) => {
   userData.userId = userName
   userData.email = payload.email
   userData.contactNumber = payload.contactNumber
-  userData.password = password
+  userData.password = payload.password
   userData.role = UserRole.admin
 
   const session = await mongoose.startSession()

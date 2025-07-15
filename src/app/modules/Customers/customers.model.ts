@@ -5,23 +5,19 @@ const customerSchema = new Schema<ICustomer>(
   {
     fullName: {
       type: String,
-      required: true,
+
       trim: true,
     },
     user: {
       type: Schema.Types.ObjectId,
-      required: true,
+
       ref: 'User',
     },
     email: {
       type: String,
-      required: true,
-      unique: true,
     },
     contactNumber: {
       type: String,
-      required: true,
-      unique: true,
     },
 
     profileImage: {
@@ -29,7 +25,6 @@ const customerSchema = new Schema<ICustomer>(
     },
     address: {
       type: String,
-      required: true,
     },
     isDeleted: {
       type: Boolean,

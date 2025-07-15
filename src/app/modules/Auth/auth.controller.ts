@@ -71,10 +71,20 @@ const resetPassword = catchAsync(async (req, res) => {
   })
 })
 
+const updatePassword = catchAsync(async (req, res) => {
+  const result = await AuthService.updatePasswordForStaff(req.body, req.user)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Password updated  successfully',
+    data: result,
+  })
+})
+
 export const AuthController = {
   login,
   loginVendor,
   generateToken,
   forgetPassword,
   resetPassword,
+  updatePassword,
 }
