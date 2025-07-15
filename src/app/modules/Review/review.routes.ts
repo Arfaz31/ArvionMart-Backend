@@ -10,12 +10,13 @@ router.post(
   auth(UserRole.customer),
   ReviewController.createReviewIntoDB
 )
+router.get('/', ReviewController.getAllReviews)
 
 router.get('/product/:productId', ReviewController.getReviewsByProduct)
 
 router.patch(
   '/update/:reviewId',
-  auth(UserRole.customer),
+  auth(UserRole.customer, UserRole.admin, UserRole.superAdmin),
   ReviewController.updateReviewByCustomer
 )
 
