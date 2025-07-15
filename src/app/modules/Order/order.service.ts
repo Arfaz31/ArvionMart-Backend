@@ -93,43 +93,66 @@ const createOrderByAdmin = async (
   customerPayload: ICustomer,
   orderPayload: IOrder
 ) => {
-  const userId = generateUserId(customerPayload.fullName)
-  orderPayload.transactionId = generateTransactionId()
-  orderPayload.orderNumber = generateOrderNumber()
-
-  const userData: Partial<IUser> = {
-    userId,
-    email: customerPayload.email,
-    contactNumber: customerPayload.contactNumber,
-    password,
-    role: UserRole.customer,
-  }
-
   const session = await mongoose.startSession()
   session.startTransaction()
 
   try {
-    // Step 1: Create User
-    const [createdUser] = await User.create([userData], { session })
+    let user = await User.findOne({
+      _id: orderPayload.customerInfo.customerId,
+    }).session(session)
 
-    if (!createdUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'User creation failed')
+    let customer
+
+    if (!user) {
+      // Step 1: Create User
+      const userId = generateUserId(customerPayload.fullName)
+
+      const userData: Partial<IUser> = {
+        userId,
+        email: customerPayload.email,
+        contactNumber: customerPayload.contactNumber,
+        password,
+        role: UserRole.customer,
+      }
+
+      const [createdUser] = await User.create([userData], { session })
+
+      if (!createdUser) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'User creation failed')
+      }
+
+      user = createdUser
+
+      // Step 2: Create Customer
+      customerPayload.user = createdUser._id
+      const [createdCustomer] = await Customers.create([customerPayload], {
+        session,
+      })
+
+      if (!createdCustomer) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Customer creation failed')
+      }
+
+      customer = createdCustomer
+    } else {
+      // Step 3: Use existing user
+      customer = await Customers.findOne({ user: user._id }).session(session)
+
+      if (!customer) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'Customer info not found for existing user'
+        )
+      }
     }
 
-    // Step 2: Create Customer
-    customerPayload.user = createdUser._id
-    const [createdCustomer] = await Customers.create([customerPayload], {
-      session,
-    })
+    // Step 4: Prepare Order
+    orderPayload.transactionId = generateTransactionId()
+    orderPayload.orderNumber = generateOrderNumber()
 
-    if (!createdCustomer) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Customer creation failed')
-    }
-
-    // Step 3: Create Order
     const [order] = await Order.create([orderPayload], { session })
 
-    // Step 4: Update Stock
+    // Step 5: Update Stock
     for (const item of orderPayload.orderItems) {
       const variant = await Variant.findById(item.variant).session(session)
       const product = await Product.findById(item.productId).session(session)
@@ -141,7 +164,6 @@ const createOrderByAdmin = async (
         )
       }
 
-      // Handle size-based reduction
       if (item.size) {
         const sizeEntry = variant.size?.find(s => s.size === item.size)
         if (!sizeEntry) {
@@ -150,28 +172,23 @@ const createOrderByAdmin = async (
             `Size "${item.size}" not found in variant ${variant._id}`
           )
         }
-
         if (sizeEntry.quantity < item.quantity) {
           throw new AppError(
             httpStatus.BAD_REQUEST,
             `Insufficient stock for size "${item.size}" in variant ${variant._id}`
           )
         }
-
         sizeEntry.quantity -= item.quantity
       } else {
-        // Simple quantity reduction
         if ((variant.quantity ?? 0) < item.quantity) {
           throw new AppError(
             httpStatus.BAD_REQUEST,
             `Insufficient variant quantity for variant ${variant._id}`
           )
         }
-
         variant.quantity = (variant.quantity ?? 0) - item.quantity
       }
 
-      // Update product quantity
       if ((product.quantity ?? 0) < item.quantity) {
         throw new AppError(
           httpStatus.BAD_REQUEST,
