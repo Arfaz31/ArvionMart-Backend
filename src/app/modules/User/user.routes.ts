@@ -10,7 +10,7 @@ const router = Router()
 
 router.get(
   '/customers',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   UserController.getAllCustomers
 )
 

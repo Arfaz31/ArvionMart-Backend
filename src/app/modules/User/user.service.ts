@@ -226,9 +226,25 @@ const registerVendor = async (password: string, payload: IVendor) => {
 }
 
 //get all user
-const getAllCustomersFromDB = async () => {
-  const result = await Customers.find().populate('user')
-  return result
+const getAllCustomersFromDB = async (query: Record<string, unknown>) => {
+  const searchableFields = ['fullName', 'email', 'contactNumber', 'address']
+
+  const customerQuery = await new QueryBuilder(
+    Customers.find().populate('user'),
+    query
+  )
+    .search(searchableFields)
+    .filter()
+    .sort()
+    .pagination()
+    .fields().modelQuery
+
+  const count = await new QueryBuilder(Customers.find(), query).countTotal()
+
+  return {
+    count,
+    customerQuery,
+  }
 }
 
 //Get me

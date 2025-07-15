@@ -56,11 +56,13 @@ const vendorRegister = catchAsync(async (req, res) => {
 })
 
 const getAllCustomers = catchAsync(async (req, res) => {
-  const result = await UserSercive.getAllCustomersFromDB()
+  const result = await UserSercive.getAllCustomersFromDB(req.query)
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: 'Customer get successfully',
-    data: result,
+    message: 'Customers fetched successfully',
+    meta: result.count,
+    data: result.customerQuery,
   })
 })
 
