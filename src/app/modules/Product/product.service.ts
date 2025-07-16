@@ -12,6 +12,12 @@ import { Vendor } from '../Vendor/vendor.model'
 import { SecondarySubcategory } from '../SecondarySubcategory/SecondarySubcategory.model'
 import { generateSku } from './product.utility'
 
+const generate13DigitBarcode = (): number => {
+  const random12Digits = Math.floor(Math.random() * 1_000_000_000_000) // max 12 digits
+  const barcode = Number('8' + random12Digits.toString().padStart(12, '0'))
+  return barcode
+}
+
 const createProductIntoDB = async (req: Request) => {
   const payload = req.body
 
@@ -64,6 +70,8 @@ const createProductIntoDB = async (req: Request) => {
   // ✅ Generate SKU & Product ID
   payload.sku = await generateSku(payload.category)
 
+  payload.barCodeNumber = generate13DigitBarcode()
+
   // ✅ Create product
   const result = await Product.create(payload)
   return result
@@ -71,7 +79,7 @@ const createProductIntoDB = async (req: Request) => {
 
 //get all product
 const getAllProducts = async (query: Record<string, unknown>) => {
-  const searchAbleFields = ['productName', 'description']
+  const searchAbleFields = ['productName', 'description', 'barCodeNumber']
   const filters: Record<string, any> = { isActive: true }
 
   // 1️⃣ Handle Variant-Based Filtering (color, size, minPrice, maxPrice)

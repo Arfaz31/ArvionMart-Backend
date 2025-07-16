@@ -13,4 +13,5 @@ export interface IProduct {
   isActive: boolean
   isNewArrival: boolean
   variant?: Types.ObjectId[]
+  barCodeNumber: number
 }
