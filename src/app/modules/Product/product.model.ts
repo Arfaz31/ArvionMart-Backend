@@ -60,6 +60,11 @@ const ProductSchema = new Schema<IProduct>(
       type: [Schema.Types.ObjectId],
       ref: 'Variant',
     },
+    barCodeNumber: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
   },
   {
     timestamps: true,
