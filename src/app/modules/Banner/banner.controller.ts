@@ -22,7 +22,33 @@ const getAllBanerFromDB = catchAsync(async (req, res) => {
   })
 })
 
+const updateBannerIntoDB = catchAsync(async (req, res) => {
+  const id = req.params.id
+  const payload = req.body
+  const file = req.file
+
+  const result = await BannerService.updateBanner(id, payload, file)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Banner updated successfully',
+    data: result,
+  })
+})
+
+const deleteBannerFromDB = catchAsync(async (req, res) => {
+  const id = req.params.id
+
+  const result = await BannerService.deleteBanner(id)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Banner deleted successfully',
+    data: result,
+  })
+})
+
 export const BannerController = {
   createBannerIntoDB,
   getAllBanerFromDB,
+  updateBannerIntoDB,
+  deleteBannerFromDB,
 }

@@ -18,4 +18,13 @@ router.post(
 
 router.get('/all-banner', BannerController.getAllBanerFromDB)
 
+router.patch(
+  '/update-banner/:id',
+  updloadSingleImage('banner-image'),
+  validateRequestedFileData(BannerValidation.updateBannerSchemaValidation),
+  BannerController.updateBannerIntoDB
+)
+
+router.delete('/delete-banner/:id', BannerController.deleteBannerFromDB)
+
 export const BannerRoutes = router

@@ -2,6 +2,9 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+export const environment = process.env.NODE_ENV
+export const logDirectory = process.env.LOG_DIRECTORY
+
 export default {
   node_env: process.env.NODE_ENV,
   port: process.env.PORT,

@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Vendor } from '../Vendor/vendor.model'
 import { IVendor } from '../Vendor/vendor.interface'
 import QueryBuilder from '../../builder/QueryBuilder'
+import { Request } from 'express'
 
 export const generateUserId = (name: string): string => {
   const cleanName = name.trim().split(' ').join('').toLowerCase()
@@ -311,7 +312,69 @@ const deleteUser = async (id: string) => {
   }
 }
 
-export const UserSercive = {
+const updateMyProfile = async (req: Request) => {
+  const { _id } = req.user
+  const payload = req.body
+
+  if (req.file) {
+    payload.profileImage = req.file.path
+  }
+
+  const filteredPayload = Object.entries(payload).reduce(
+    (acc, [key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = value
+      }
+      return acc
+    },
+    {} as Record<string, any>
+  )
+
+  const updatedUser = await User.findByIdAndUpdate(_id, filteredPayload, {
+    new: true,
+  }).select('-password')
+
+  return updatedUser
+}
+
+const updateUserProfileByAdmin = async (req: Request) => {
+  const { id } = req.params
+  const payload = req.body
+
+  if (req.file) {
+    payload.profileImage = req.file.path
+  }
+
+  const userToUpdate = await User.findById(id)
+  if (!userToUpdate) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  if (!['admin', 'customer'].includes(userToUpdate.role)) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'Only admin or customer can be updated'
+    )
+  }
+
+  const filteredPayload = Object.entries(payload).reduce(
+    (acc, [key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = value
+      }
+      return acc
+    },
+    {} as Record<string, any>
+  )
+
+  const updatedUser = await User.findByIdAndUpdate(id, filteredPayload, {
+    new: true,
+  }).select('-password')
+
+  return updatedUser
+}
+
+export const UserService = {
   registerUser,
   registerVendor,
   createAdmin,
@@ -319,4 +382,6 @@ export const UserSercive = {
   getMe,
   deleteUser,
   getAllAdmin,
+  updateMyProfile,
+  updateUserProfileByAdmin,
 }

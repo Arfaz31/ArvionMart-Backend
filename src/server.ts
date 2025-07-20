@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import config from './app/config'
 import { Server } from 'http'
 import seedSuperAdmin from './app/DB'
+import Logger from './app/core/Logger'
 
 const port = process.env.PORT || config.port
 
@@ -17,6 +18,9 @@ async function main() {
     //@ts-ignore
     server = app.listen(port, () => {
       console.log(
+        `🚀 ArvionMart server is running at http://192.168.0.104:${port}`
+      )
+      Logger.info(
         `🚀 ArvionMart server is running at http://192.168.0.104:${port}`
       )
     })
