@@ -14,6 +14,12 @@ const customerSchemaValidation = z.object({
   }),
 })
 
+const updateCustomerSchemaValidation = z.object({
+  fullName: z.string().min(1, 'Full name is required'),
+  address: z.string().min(1, 'Address is required'),
+})
+
 export const UserValidation = {
   customerSchemaValidation,
+  updateCustomerSchemaValidation,
 }

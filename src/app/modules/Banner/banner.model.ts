@@ -32,6 +32,11 @@ const BannerSchema = new Schema<IBanner>(
       type: Boolean,
       default: false,
     },
+    status: {
+      type: String,
+      enum: ['ACTIVE', 'INACTIVE'],
+      default: 'INACTIVE',
+    },
   },
   {
     timestamps: true,

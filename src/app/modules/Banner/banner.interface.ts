@@ -7,4 +7,5 @@ export interface IBanner {
   secondarySubcategoryId?: Types.ObjectId
   productId?: Types.ObjectId
   isDeleted: boolean
+  status: 'ACTIVE' | 'INACTIVE'
 }

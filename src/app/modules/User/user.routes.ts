@@ -5,6 +5,7 @@ import { UserValidation } from './user.validation'
 import { AdminValidation } from '../Admin/admin.validation'
 import auth from '../../middleware/auth'
 import { UserRole } from './user.contant'
+import { updloadSingleImage } from '../../config/cloudinary/multer.config'
 
 const router = Router()
 
@@ -42,5 +43,21 @@ router.get(
 )
 
 router.delete('/:id', auth(UserRole.admin), UserController.deleteUser)
+
+router.patch(
+  '/update-my-profile',
+  auth(UserRole.admin, UserRole.customer),
+  updloadSingleImage('profileImage'),
+  // validateRequestedFileData(updateUserValidationSchema), // optional
+  UserController.updateMyProfile
+)
+
+router.patch(
+  '/update-user-profile/:id',
+  auth(UserRole.superAdmin),
+  updloadSingleImage('profileImage'),
+  // validateRequestedFileData(updateUserValidationSchema), // optional
+  UserController.updateUserProfileByAdmin
+)
 
 export const UserRoutes = router
