@@ -1,26 +1,26 @@
 import { Request } from 'express'
-import { PromoBanner } from './promoCard.model'
+import { PromoCard } from './promoCard.model'
 import QueryBuilder from '../../builder/QueryBuilder'
-import { IPromoBanner } from './promoCard.interface'
+import { IPromoCard } from './promoCard.interface'
 import { AppError } from '../../Error/AppError'
 import httpStatus from 'http-status'
 
-const createPromoBanner = async (req: Request) => {
+const createPromoCard = async (req: Request) => {
   const file = req.file
   const payload = req.body
   payload.bannerImage = file?.path
-  const result = await PromoBanner.create(payload)
+  const result = await PromoCard.create(payload)
   return result
 }
 
-const getPromoBanner = async (query: Record<string, unknown>) => {
+const getPromoCard = async (query: Record<string, unknown>) => {
   const updatedQuery = {
     ...query,
     sort: '-status -createdAt',
   }
 
   const result = await new QueryBuilder(
-    PromoBanner.find()
+    PromoCard.find()
       .populate('categoryId')
       .populate('subcategoryId')
       .populate('secondarySubcategoryId')
@@ -34,7 +34,7 @@ const getPromoBanner = async (query: Record<string, unknown>) => {
     .fields().modelQuery
 
   const count = await new QueryBuilder(
-    PromoBanner.find(),
+    PromoCard.find(),
     updatedQuery
   ).countTotal()
 
@@ -46,14 +46,14 @@ const getPromoBanner = async (query: Record<string, unknown>) => {
 
 const updatePromoCard = async (
   id: string,
-  payload: Partial<IPromoBanner>,
+  payload: Partial<IPromoCard>,
   file?: any
 ) => {
   if (file) {
     payload.bannerImage = file?.path
   }
 
-  const updatedBanner = await PromoBanner.findByIdAndUpdate(id, payload, {
+  const updatedBanner = await PromoCard.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
   })
@@ -66,11 +66,7 @@ const updatePromoCard = async (
 }
 
 const deletePormoCard = async (id: string) => {
-  const deletedBanner = await PromoBanner.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true }
-  )
+  const deletedBanner = await PromoCard.findByIdAndDelete(id)
 
   if (!deletedBanner) {
     throw new AppError(httpStatus.NOT_FOUND, 'PromoCard not found')
@@ -79,9 +75,9 @@ const deletePormoCard = async (id: string) => {
   return deletedBanner
 }
 
-export const PromoBannerService = {
-  createPromoBanner,
-  getPromoBanner,
+export const PromoCardService = {
+  createPromoCard,
+  getPromoCard,
   updatePromoCard,
   deletePormoCard,
 }

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const PromoBannerSchema = z.object({
+const PromoCardSchema = z.object({
   categoryId: z.string().optional(),
   subcategoryId: z.string().optional(),
   secondarySubcategoryId: z.string().optional(),
@@ -8,6 +8,6 @@ const PromoBannerSchema = z.object({
   status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
 })
 
-export const PromoBannerValidation = {
-  PromoBannerSchema,
+export const PromoCardValidation = {
+  PromoCardSchema,
 }

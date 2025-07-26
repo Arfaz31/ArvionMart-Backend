@@ -1,11 +1,15 @@
 import { Router } from 'express'
 import { UserController } from './user.controller'
 import validateData from '../../middleware/validateRequest'
-import { UserValidation } from './user.validation'
+import {
+  updateCustomerSchemaValidation,
+  UserValidation,
+} from './user.validation'
 import { AdminValidation } from '../Admin/admin.validation'
 import auth from '../../middleware/auth'
 import { UserRole } from './user.contant'
 import { updloadSingleImage } from '../../config/cloudinary/multer.config'
+import { validateRequestedFileData } from '../../middleware/validateRequestedFileData'
 
 const router = Router()
 
@@ -48,7 +52,7 @@ router.patch(
   '/update-my-profile',
   auth(UserRole.admin, UserRole.customer),
   updloadSingleImage('profileImage'),
-  // validateRequestedFileData(updateUserValidationSchema), // optional
+  validateRequestedFileData(updateCustomerSchemaValidation), // optional
   UserController.updateMyProfile
 )
 

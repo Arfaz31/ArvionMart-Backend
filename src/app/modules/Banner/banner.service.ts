@@ -68,11 +68,7 @@ const updateBanner = async (
 }
 
 const deleteBanner = async (id: string) => {
-  const deletedBanner = await Banner.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true }
-  )
+  const deletedBanner = await Banner.findByIdAndDelete(id)
 
   if (!deletedBanner) {
     throw new AppError(httpStatus.NOT_FOUND, 'Banner not found')

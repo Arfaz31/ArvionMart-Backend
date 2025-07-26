@@ -50,11 +50,15 @@ const ProductSchema = new Schema<IProduct>(
     },
     isActive: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     isNewArrival: {
       type: Boolean,
-      default: true,
+      default: false,
+    },
+    isFeatured: {
+      type: Boolean,
+      default: false,
     },
     variant: {
       type: [Schema.Types.ObjectId],

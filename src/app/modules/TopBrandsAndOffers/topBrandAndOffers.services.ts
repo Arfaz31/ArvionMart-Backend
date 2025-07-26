@@ -110,11 +110,7 @@ const updateBrandOffer = async (req: Request) => {
 }
 
 const deleteBrandOffer = async (id: string) => {
-  const result = await BrandOffer.findByIdAndUpdate(
-    id,
-    { isDeleted: true, status: 'INACTIVE' },
-    { new: true }
-  )
+  const result = await BrandOffer.findByIdAndDelete(id)
   return result
 }
 

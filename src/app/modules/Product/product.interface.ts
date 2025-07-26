@@ -11,7 +11,8 @@ export interface IProduct {
   quantity?: number
   stock: number
   isActive: boolean
-  isNewArrival: boolean
+  isNewArrival?: boolean
+  isFeatured?: boolean
   variant?: Types.ObjectId[]
   barCodeNumber: number
 }

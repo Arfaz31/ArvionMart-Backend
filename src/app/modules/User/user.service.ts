@@ -320,6 +320,16 @@ const updateMyProfile = async (req: Request) => {
     payload.profileImage = req.file.path
   }
 
+  const user = await User.findById(_id)
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  const customer = await Customers.findOne({ user: _id })
+  if (!customer) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Customer not found')
+  }
+
   const filteredPayload = Object.entries(payload).reduce(
     (acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
@@ -330,11 +340,15 @@ const updateMyProfile = async (req: Request) => {
     {} as Record<string, any>
   )
 
-  const updatedUser = await User.findByIdAndUpdate(_id, filteredPayload, {
-    new: true,
-  }).select('-password')
+  const updatedCustomer = await Customers.findOneAndUpdate(
+    { user: _id },
+    filteredPayload,
+    {
+      new: true,
+    }
+  )
 
-  return updatedUser
+  return updatedCustomer
 }
 
 const updateUserProfileByAdmin = async (req: Request) => {
