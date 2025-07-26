@@ -18,4 +18,16 @@ router.post(
 
 router.get('/get-all-promo-card', PromoBannerController.getAllPromoBannerDB)
 
+router.patch(
+  '/update-promo-card/:id',
+  updloadSingleImage('promo-banner'),
+  validateRequestedFileData(PromoBannerValidation.PromoBannerSchema),
+  PromoBannerController.updatePromoBannerIntoDB
+)
+
+router.delete(
+  '/delete-promo-card/:id',
+  PromoBannerController.deletePromoBannerFromDB
+)
+
 export const PromoBannerRoutes = router

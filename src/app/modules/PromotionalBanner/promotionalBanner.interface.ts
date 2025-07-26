@@ -8,4 +8,5 @@ export interface IPromotionalBanner {
   productId?: Types.ObjectId
   brandId?: Types.ObjectId
   isDeleted: boolean
+  status: 'ACTIVE' | 'INACTIVE'
 }

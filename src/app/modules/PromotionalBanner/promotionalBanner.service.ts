@@ -14,7 +14,14 @@ const createPromotionalBanner = async (req: Request) => {
 }
 
 const getAllPromotionalBanner = async (query: Record<string, unknown>) => {
-  const bannerQuery = await new QueryBuilder(PromotionalBanner.find(), query)
+  const updatedQuery = {
+    ...query,
+    sort: '-status -createdAt',
+  }
+  const bannerQuery = await new QueryBuilder(
+    PromotionalBanner.find(),
+    updatedQuery
+  )
     .search([])
     .filter()
     .sort()
@@ -23,7 +30,7 @@ const getAllPromotionalBanner = async (query: Record<string, unknown>) => {
 
   const count = await new QueryBuilder(
     PromotionalBanner.find(),
-    query
+    updatedQuery
   ).countTotal()
 
   return {

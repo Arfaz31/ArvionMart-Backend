@@ -37,6 +37,11 @@ const PromotionalBannerSchema = new Schema<IPromotionalBanner>(
       type: Boolean,
       default: false,
     },
+    status: {
+      type: String,
+      enum: ['ACTIVE', 'INACTIVE'],
+      default: 'INACTIVE',
+    },
   },
   {
     timestamps: true,
