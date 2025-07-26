@@ -21,7 +21,7 @@ const getAllBanner = async (query: Record<string, unknown>) => {
   // Set default sort by status (ACTIVE first), fallback to createdAt
   const updatedQuery = {
     ...query,
-    sort: '-status -createdAt',
+    sort: '-status order',
   }
 
   const bannerQuery = await new QueryBuilder(

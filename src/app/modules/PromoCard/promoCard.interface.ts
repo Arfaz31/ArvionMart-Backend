@@ -7,4 +7,5 @@ export interface IPromoBanner {
   secondarySubcategoryId?: Types.ObjectId
   productId?: Types.ObjectId
   isDeleted?: boolean
+  status: 'ACTIVE' | 'INACTIVE'
 }

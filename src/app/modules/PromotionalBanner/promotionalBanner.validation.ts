@@ -6,6 +6,7 @@ export const PromotionalBannerSchema = z.object({
   secondarySubcategoryId: z.string().optional(),
   productId: z.string().optional(),
   brandId: z.string().optional(),
+  status: z.enum(['ACTIVE', 'INACTIVE']).optional(),
 })
 
 export const PromotionalBannerValidation = {
