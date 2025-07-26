@@ -17,6 +17,7 @@ const productSchemaValidation = z.object({
     .default(0),
 
   isNewArrival: z.boolean().default(false),
+  isFeatured: z.boolean().default(false),
 })
 
 export const updateProductSchemaValidation = z.object({
@@ -47,6 +48,7 @@ export const updateProductSchemaValidation = z.object({
     .optional(),
 
   isNewArrival: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
 })
 
 export const ProductValidation = {

@@ -1,10 +1,10 @@
 import catchAsync from '../../utils/catchAsync'
 import sendResponse from '../../utils/sendResponse'
-import { PromoBannerService } from './promoCard.service'
+import { PromoCardService } from './promoCard.service'
 import httpStatus from 'http-status'
 
 const createPromoBannerIntoDB = catchAsync(async (req, res) => {
-  const result = await PromoBannerService.createPromoBanner(req)
+  const result = await PromoCardService.createPromoCard(req)
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     message: 'PromoBanner created successfully',
@@ -13,7 +13,7 @@ const createPromoBannerIntoDB = catchAsync(async (req, res) => {
 })
 
 const getAllPromoBannerDB = catchAsync(async (req, res) => {
-  const result = await PromoBannerService.getPromoBanner(req.query)
+  const result = await PromoCardService.getPromoCard(req.query)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Promo Banner get succesfully ',
@@ -27,7 +27,7 @@ const updatePromoBannerIntoDB = catchAsync(async (req, res) => {
   const payload = req.body
   const file = req.file
 
-  const result = await PromoBannerService.updatePromoCard(id, payload, file)
+  const result = await PromoCardService.updatePromoCard(id, payload, file)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Promo Banner updated successfully',
@@ -38,7 +38,7 @@ const updatePromoBannerIntoDB = catchAsync(async (req, res) => {
 const deletePromoBannerFromDB = catchAsync(async (req, res) => {
   const id = req.params.id
 
-  const result = await PromoBannerService.deletePormoCard(id)
+  const result = await PromoCardService.deletePormoCard(id)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Promo Banner deleted successfully',
@@ -46,7 +46,7 @@ const deletePromoBannerFromDB = catchAsync(async (req, res) => {
   })
 })
 
-export const PromoBannerController = {
+export const PromoCardController = {
   createPromoBannerIntoDB,
   getAllPromoBannerDB,
   updatePromoBannerIntoDB,

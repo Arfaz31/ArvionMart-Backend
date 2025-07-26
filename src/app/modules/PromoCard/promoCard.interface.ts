@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'
 
-export interface IPromoBanner {
+export interface IPromoCard {
   bannerImage: string
   categoryId?: Types.ObjectId
   subcategoryId?: Types.ObjectId

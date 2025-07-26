@@ -24,7 +24,37 @@ const getAllPromotionalBanerFromDB = catchAsync(async (req, res) => {
   })
 })
 
+const updatePromotionalBannerIntoDB = catchAsync(async (req, res) => {
+  const id = req.params.id
+  const payload = req.body
+  const file = req.file
+
+  const result = await PromotionalBannerService.updatePromotionalBanner(
+    id,
+    payload,
+    file
+  )
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Promotional Banner updated successfully',
+    data: result,
+  })
+})
+
+const deletePromotionalBannerIntoDB = catchAsync(async (req, res) => {
+  const id = req.params.id
+  const result = await PromotionalBannerService.deletePormotionalBanner(id)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Promotional Banner deleted successfully',
+    data: result,
+  })
+})
+
 export const PromotionalBannerController = {
   createPromotionalBannerIntoDB,
   getAllPromotionalBanerFromDB,
+  updatePromotionalBannerIntoDB,
+  deletePromotionalBannerIntoDB,
 }

@@ -9,17 +9,20 @@ import validateData from '../../middleware/validateRequest'
 
 const router = express.Router()
 
+router.post(
+  '/create-product',
+  // auth(UserRole.admin, UserRole.superAdmin),
+  validateData(ProductValidation.productSchemaValidation),
+  ProductController.createProduct
+)
+
 router.get(
   '/',
   // auth(...Object.values(UserRole)),
   ProductController.getAllProducts
 )
 
-router.get(
-  '/single/:id',
-  // auth(...Object.values(UserRole)),
-  ProductController.getSingleProduct
-)
+router.get('/featured', ProductController.getIsFeaturedProduct)
 
 router.get(
   '/new-arrivals',
@@ -40,6 +43,12 @@ router.get(
 )
 
 router.get(
+  '/single/:id',
+  // auth(...Object.values(UserRole)),
+  ProductController.getSingleProduct
+)
+
+router.get(
   '/category/:categoryId',
   // auth(...Object.values(UserRole)),
   ProductController.getProductsByCategory
@@ -55,13 +64,6 @@ router.get(
   '/:id/related',
   // auth(...Object.values(UserRole)),
   ProductController.getCategoryRelatedProducts
-)
-
-router.post(
-  '/create-product',
-  // auth(UserRole.admin, UserRole.superAdmin),
-  validateData(ProductValidation.productSchemaValidation),
-  ProductController.createProduct
 )
 
 router.patch(

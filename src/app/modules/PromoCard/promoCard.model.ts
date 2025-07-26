@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, model } from 'mongoose'
-import { IPromoBanner } from './promoCard.interface'
+import { IPromoCard } from './promoCard.interface'
 
-const PromoBannerSchema = new Schema<IPromoBanner>(
+const PromoCardSchema = new Schema<IPromoCard>(
   {
     bannerImage: {
       type: String,
@@ -43,4 +43,4 @@ const PromoBannerSchema = new Schema<IPromoBanner>(
   }
 )
 
-export const PromoBanner = model<IPromoBanner>('PromoBanner', PromoBannerSchema)
+export const PromoCard = model<IPromoCard>('PromoCard', PromoCardSchema)

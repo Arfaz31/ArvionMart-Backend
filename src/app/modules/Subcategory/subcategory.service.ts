@@ -94,13 +94,7 @@ const deletesubcategory = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Subcategory does not exist')
   }
 
-  const result = await Subcategory.findByIdAndUpdate(
-    _id,
-    { isDeleted: true, status: 'INACTIVE' },
-    {
-      new: true,
-    }
-  )
+  const result = await Subcategory.findByIdAndDelete(_id)
   return result
 }
 

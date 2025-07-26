@@ -99,13 +99,7 @@ const deleteSecondarySubcategory = async (id: string) => {
   if (!isExist) {
     throw new Error('Secondary Subcategory does not exist')
   }
-  const result = await SecondarySubcategory.findOneAndDelete(
-    { _id: id },
-    {
-      status: 'INACTIVE',
-      isDeleted: true,
-    }
-  )
+  const result = await SecondarySubcategory.findByIdAndDelete(id)
   return result
 }
 

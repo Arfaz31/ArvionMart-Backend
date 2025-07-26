@@ -1,7 +1,9 @@
 import { Request } from 'express'
 import QueryBuilder from '../../builder/QueryBuilder'
 import { PromotionalBanner } from './promotionalBanner.model'
-
+import { AppError } from '../../Error/AppError'
+import { IPromotionalBanner } from './promotionalBanner.interface'
+import httpStatus from 'http-status'
 const createPromotionalBanner = async (req: Request) => {
   const payload = req.body
   const file = req.file
@@ -39,7 +41,40 @@ const getAllPromotionalBanner = async (query: Record<string, unknown>) => {
   }
 }
 
+const updatePromotionalBanner = async (
+  id: string,
+  payload: Partial<IPromotionalBanner>,
+  file?: any
+) => {
+  if (file) {
+    payload.image = file?.path
+  }
+
+  const updatedBanner = await PromotionalBanner.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  })
+
+  if (!updatedBanner) {
+    throw new AppError(httpStatus.NOT_FOUND, 'PromoBanner not found')
+  }
+
+  return updatedBanner
+}
+
+const deletePormotionalBanner = async (id: string) => {
+  const deletedBanner = await PromotionalBanner.findByIdAndDelete(id)
+
+  if (!deletedBanner) {
+    throw new AppError(httpStatus.NOT_FOUND, 'PromoBanner not found')
+  }
+
+  return deletedBanner
+}
+
 export const PromotionalBannerService = {
   createPromotionalBanner,
   getAllPromotionalBanner,
+  updatePromotionalBanner,
+  deletePormotionalBanner,
 }

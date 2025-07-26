@@ -94,6 +94,11 @@ const getAllProducts = async (query: Record<string, unknown>) => {
       query.isNewArrival === 'true' || query.isNewArrival === true
   }
 
+  if (query.isFeatured !== undefined) {
+    filters.isFeatured =
+      query.isFeatured === 'true' || query.isFeatured === true
+  }
+
   if (query.size) {
     const sizeValues = Array.isArray(query.size)
       ? query.size.map(String)
@@ -199,6 +204,20 @@ const getAllProducts = async (query: Record<string, unknown>) => {
     meta,
     result,
   }
+}
+
+const getIsFeaturedProduct = async () => {
+  const result = await Product.find({
+    isFeatured: true,
+    isActive: true,
+  })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('secondarySubcategory')
+    .populate('variant')
+
+  return result
 }
 
 //getproductBy vendor
@@ -403,9 +422,17 @@ const deleteProduct = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Product does not exist')
   }
 
+  const variant = await Variant.find({ productId: _id })
+  if (variant && variant.length > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete a product with variants'
+    )
+  }
+
   const result = await Product.findByIdAndUpdate(
     _id,
-    { isDeleted: true, isActive: false },
+    { isActive: false },
     {
       new: true,
     }
@@ -487,6 +514,7 @@ const getCategoryRelatedProductsFromDB = async (excludeProductId: string) => {
 export const ProductService = {
   createProductIntoDB,
   getAllProducts,
+  getIsFeaturedProduct,
   getSingleProduct,
   updateProduct,
   deleteProduct,
