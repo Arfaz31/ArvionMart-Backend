@@ -28,6 +28,11 @@ const getAllBrand = async (query: Record<string, unknown>) => {
   }
 }
 
+const getActiveBrand = async () => {
+  const result = await Brand.find({ status: 'ACTIVE' })
+  return result
+}
+
 const updateBrand = async (req: Request) => {
   const { id: _id } = req.params
   const payload = req.body
@@ -76,6 +81,7 @@ const deleteBrand = async (id: string) => {
 export const BrandService = {
   createBrand,
   getAllBrand,
+  getActiveBrand,
   updateBrand,
   deleteBrand,
 }

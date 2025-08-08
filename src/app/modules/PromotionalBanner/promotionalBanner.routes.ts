@@ -22,6 +22,10 @@ router.get(
   '/all-promotional-banner',
   PromotionalBannerController.getAllPromotionalBanerFromDB
 )
+router.get(
+  '/all-active-promotional-banner',
+  PromotionalBannerController.getActivePromotionalBannerFromDB
+)
 
 router.patch(
   '/update-promotional-banner/:id',

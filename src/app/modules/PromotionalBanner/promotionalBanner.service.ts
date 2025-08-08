@@ -41,6 +41,11 @@ const getAllPromotionalBanner = async (query: Record<string, unknown>) => {
   }
 }
 
+const getActivePromotionalBanner = async () => {
+  const banner = await PromotionalBanner.findOne({ status: 'ACTIVE' })
+  return banner
+}
+
 const updatePromotionalBanner = async (
   id: string,
   payload: Partial<IPromotionalBanner>,
@@ -75,6 +80,7 @@ const deletePormotionalBanner = async (id: string) => {
 export const PromotionalBannerService = {
   createPromotionalBanner,
   getAllPromotionalBanner,
+  getActivePromotionalBanner,
   updatePromotionalBanner,
   deletePormotionalBanner,
 }
