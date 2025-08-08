@@ -20,6 +20,23 @@ const login = catchAsync(async (req, res) => {
   })
 })
 
+const googleLogin = catchAsync(async (req, res) => {
+  const result = await AuthService.googleLogin(req.body)
+  if (result) {
+    const { refreshToken } = result
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    })
+  }
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Login successfully',
+    data: result,
+  })
+})
+
 //vendor login
 const loginVendor = catchAsync(async (req, res) => {
   const result = await AuthService.vendorLogin(req.body)
@@ -74,6 +91,7 @@ const resetPassword = catchAsync(async (req, res) => {
 export const AuthController = {
   login,
   loginVendor,
+  googleLogin,
   generateToken,
   forgetPassword,
   resetPassword,

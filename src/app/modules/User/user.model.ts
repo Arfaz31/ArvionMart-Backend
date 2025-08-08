@@ -7,24 +7,14 @@ import config from '../../config'
 
 const userSchema = new Schema<IUser>(
   {
-    userId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     email: {
       type: String,
-      required: true,
-      unique: true,
     },
     contactNumber: {
       type: String,
-      required: true,
-      unique: true,
     },
     password: {
       type: String,
-      required: true,
     },
     needPasswordChange: {
       type: Boolean,
@@ -56,16 +46,20 @@ const userSchema = new Schema<IUser>(
 
 userSchema.pre('save', async function (next) {
   const user = this
-  const isExisting = await User.findOne({
-    contactNumber: user.contactNumber,
-  })
-  if (isExisting) {
-    throw new AppError(HttpStatus.BAD_REQUEST, 'User already exists')
+  if (user.contactNumber) {
+    const isExisting = await User.findOne({
+      contactNumber: user.contactNumber,
+    })
+    if (isExisting) {
+      throw new AppError(HttpStatus.BAD_REQUEST, 'User already exists')
+    }
   }
 
   if (user.isModified('password')) {
-    const password = user.password
-    user.password = await bcrypt.hash(password, Number(config.salt_rounds))
+    if (user.password) {
+      const password = user.password
+      user.password = await bcrypt.hash(password, Number(config.salt_rounds))
+    }
   }
 
   next()

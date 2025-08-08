@@ -1,5 +1,7 @@
 export interface IAuth {
+  fullName?: string
   email?: string
   contactNumber?: string
-  password: string
+  profileImage?: string
+  password?: string
 }
