@@ -13,6 +13,11 @@ router.get(
   // auth(...Object.values(UserRole)),
   BrandController.getAllBrand
 )
+router.get(
+  '/all-active-brand',
+  // auth(...Object.values(UserRole)),
+  BrandController.getActiveBrand
+)
 
 router.post(
   '/create-brand',
