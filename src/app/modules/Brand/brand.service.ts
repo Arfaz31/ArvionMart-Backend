@@ -28,6 +28,11 @@ const getAllBrand = async (query: Record<string, unknown>) => {
   }
 }
 
+const getActiveBrand = async () => {
+  const result = await Brand.find({ status: 'ACTIVE' })
+  return result
+}
+
 const updateBrand = async (req: Request) => {
   const { id: _id } = req.params
   const payload = req.body
@@ -55,21 +60,28 @@ const updateBrand = async (req: Request) => {
   return result
 }
 
+// const deleteBrand = async (id: string) => {
+//   const _id = id
+//   const result = await Brand.findByIdAndUpdate(
+//     _id,
+//     { isDeleted: true, status: 'INACTIVE' },
+//     {
+//       new: true,
+//     }
+//   )
+//   return result
+// }
+
 const deleteBrand = async (id: string) => {
   const _id = id
-  const result = await Brand.findByIdAndUpdate(
-    _id,
-    { isDeleted: true, status: 'INACTIVE' },
-    {
-      new: true,
-    }
-  )
+  const result = await Brand.findByIdAndDelete(_id)
   return result
 }
 
 export const BrandService = {
   createBrand,
   getAllBrand,
+  getActiveBrand,
   updateBrand,
   deleteBrand,
 }

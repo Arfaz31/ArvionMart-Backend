@@ -70,6 +70,15 @@ const deleteProduct = catchAsync(async (req, res) => {
   })
 })
 
+const getIsFeaturedProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.getIsFeaturedProduct()
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Featured products retrieved successfully',
+    data: result,
+  })
+})
+
 const getNewArrivals = catchAsync(async (req, res) => {
   const result = await ProductService.getNewArrivals()
   sendResponse(res, {
@@ -108,9 +117,26 @@ const getProductsCountByVendor = catchAsync(async (req, res) => {
   })
 })
 
+const getCategoryRelatedProducts = catchAsync(async (req, res) => {
+  const { id } = req.params
+
+  const relatedProducts = await ProductService.getCategoryRelatedProductsFromDB(
+    id
+  )
+  // the id (which is the ID of the product itself).
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Related products retrieved successfully',
+    data: relatedProducts,
+  })
+})
+
 export const ProductController = {
   createProduct,
   getAllProducts,
+  getIsFeaturedProduct,
   getSingleProduct,
   updateProductIntoDB,
   deleteProduct,
@@ -120,4 +146,5 @@ export const ProductController = {
   // getProductByVendor,
   getLastProduct,
   getProductsCountByVendor,
+  getCategoryRelatedProducts,
 }

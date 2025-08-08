@@ -4,6 +4,11 @@ import { IBanner } from './banner.interface'
 
 const BannerSchema = new Schema<IBanner>(
   {
+    order: {
+      type: Number,
+      required: [true, 'Order is required'],
+      unique: true,
+    },
     image: {
       type: String,
       required: [true, 'Image URL is required'],
@@ -31,6 +36,11 @@ const BannerSchema = new Schema<IBanner>(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    status: {
+      type: String,
+      enum: ['ACTIVE', 'INACTIVE'],
+      default: 'INACTIVE',
     },
   },
   {

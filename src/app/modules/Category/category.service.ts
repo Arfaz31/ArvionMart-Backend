@@ -82,13 +82,8 @@ const updateCategory = async (req: Request) => {
 
 const deleteCategory = async (id: string) => {
   const _id = id
-  const result = await Category.findByIdAndUpdate(
-    _id,
-    { isDeleted: true, status: 'INACTIVE' },
-    {
-      new: true,
-    }
-  )
+  const result = await Category.findByIdAndDelete(_id)
+
   return result
 }
 

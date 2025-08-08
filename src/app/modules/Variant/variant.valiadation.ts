@@ -58,8 +58,6 @@ const updateVariantSchema = z.object({
     .min(0, 'Selling price cannot be negative')
     .optional(),
   discount: z.number().min(0, 'Discount cannot be negative').optional(),
-  productId: z.string().optional(),
-  productSKU: z.string().optional(),
   unit: z.string().optional(),
 })
 

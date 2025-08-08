@@ -1,16 +1,21 @@
 import { Router } from 'express'
 import { UserController } from './user.controller'
 import validateData from '../../middleware/validateRequest'
-import { UserValidation } from './user.validation'
+import {
+  updateCustomerSchemaValidation,
+  UserValidation,
+} from './user.validation'
 import { AdminValidation } from '../Admin/admin.validation'
 import auth from '../../middleware/auth'
 import { UserRole } from './user.contant'
+import { updloadSingleImage } from '../../config/cloudinary/multer.config'
+import { validateRequestedFileData } from '../../middleware/validateRequestedFileData'
 
 const router = Router()
 
 router.get(
   '/customers',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   UserController.getAllCustomers
 )
 
@@ -42,5 +47,21 @@ router.get(
 )
 
 router.delete('/:id', auth(UserRole.admin), UserController.deleteUser)
+
+router.patch(
+  '/update-my-profile',
+  auth(UserRole.admin, UserRole.customer),
+  updloadSingleImage('profileImage'),
+  validateRequestedFileData(updateCustomerSchemaValidation), // optional
+  UserController.updateMyProfile
+)
+
+router.patch(
+  '/update-user-profile/:id',
+  auth(UserRole.superAdmin),
+  updloadSingleImage('profileImage'),
+  // validateRequestedFileData(updateUserValidationSchema), // optional
+  UserController.updateUserProfileByAdmin
+)
 
 export const UserRoutes = router

@@ -33,6 +33,11 @@ const orderItemSchema = new Schema<TOrderItem>(
       required: true,
       min: 0,
     },
+    purchasePrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
     variant: {
       type: Schema.Types.ObjectId,
       required: true,
@@ -48,6 +53,9 @@ const orderItemSchema = new Schema<TOrderItem>(
       type: Number,
       required: true,
       min: 1,
+    },
+    image: {
+      type: String,
     },
   },
   { _id: false }
@@ -161,6 +169,9 @@ const orderSchema = new Schema<IOrder>(
       type: String,
     },
     noteFromAdmin: {
+      type: String,
+    },
+    noteFromCustomer: {
       type: String,
     },
   },

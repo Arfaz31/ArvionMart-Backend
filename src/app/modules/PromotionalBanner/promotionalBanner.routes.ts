@@ -22,5 +22,23 @@ router.get(
   '/all-promotional-banner',
   PromotionalBannerController.getAllPromotionalBanerFromDB
 )
+router.get(
+  '/all-active-promotional-banner',
+  PromotionalBannerController.getActivePromotionalBannerFromDB
+)
+
+router.patch(
+  '/update-promotional-banner/:id',
+  updloadSingleImage('promobanner-image'),
+  validateRequestedFileData(
+    PromotionalBannerValidation.PromotionalBannerSchema
+  ),
+  PromotionalBannerController.updatePromotionalBannerIntoDB
+)
+
+router.delete(
+  '/delete-promotional-banner/:id',
+  PromotionalBannerController.deletePromotionalBannerIntoDB
+)
 
 export const PromotionalBannerRoutes = router

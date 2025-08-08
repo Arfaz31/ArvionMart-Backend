@@ -16,12 +16,8 @@ const productSchemaValidation = z.object({
     .nonnegative('Stock cannot be negative')
     .default(0),
 
-  isActive: z.boolean().default(true),
   isNewArrival: z.boolean().default(false),
-})
-
-const updateFeatureSchema = z.object({
-  featureName: z.string().min(1, 'Feature name is required').trim(),
+  isFeatured: z.boolean().default(false),
 })
 
 export const updateProductSchemaValidation = z.object({
@@ -51,9 +47,8 @@ export const updateProductSchemaValidation = z.object({
     .nonnegative('Stock cannot be negative')
     .optional(),
 
-  isActive: z.boolean().optional(),
-
   isNewArrival: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
 })
 
 export const ProductValidation = {

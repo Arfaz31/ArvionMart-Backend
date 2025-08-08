@@ -15,8 +15,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { Vendor } from '../Vendor/vendor.model'
 import { IVendor } from '../Vendor/vendor.interface'
 import QueryBuilder from '../../builder/QueryBuilder'
+import { Request } from 'express'
 
-const generateUserId = (name: string): string => {
+export const generateUserId = (name: string): string => {
   const cleanName = name.trim().split(' ').join('').toLowerCase()
   const shortUuid = uuidv4().slice(0, 6) // keep it short & readable
   return `${cleanName}-${shortUuid}`
@@ -88,7 +89,7 @@ const registerUser = async (password: string, payload: ICustomer) => {
 }
 
 //create-admin
-const createAdmin = async (password: string, payload: IAdmin) => {
+const createAdmin = async (payload: any) => {
   const userName = generateUserId(payload.fullName)
 
   const existingUser = await User.findOne({ email: payload.email })
@@ -101,7 +102,7 @@ const createAdmin = async (password: string, payload: IAdmin) => {
   //user-data
   userData.email = payload.email
   userData.contactNumber = payload.contactNumber
-  userData.password = password
+  userData.password = payload.password
   userData.role = UserRole.admin
 
   const session = await mongoose.startSession()
@@ -219,9 +220,25 @@ const registerVendor = async (password: string, payload: IVendor) => {
 }
 
 //get all user
-const getAllCustomersFromDB = async () => {
-  const result = await Customers.find().populate('user')
-  return result
+const getAllCustomersFromDB = async (query: Record<string, unknown>) => {
+  const searchableFields = ['fullName', 'email', 'contactNumber', 'address']
+
+  const customerQuery = await new QueryBuilder(
+    Customers.find().populate('user'),
+    query
+  )
+    .search(searchableFields)
+    .filter()
+    .sort()
+    .pagination()
+    .fields().modelQuery
+
+  const count = await new QueryBuilder(Customers.find(), query).countTotal()
+
+  return {
+    count,
+    customerQuery,
+  }
 }
 
 //Get me
@@ -288,7 +305,83 @@ const deleteUser = async (id: string) => {
   }
 }
 
-export const UserSercive = {
+const updateMyProfile = async (req: Request) => {
+  const { _id } = req.user
+  const payload = req.body
+
+  if (req.file) {
+    payload.profileImage = req.file.path
+  }
+
+  const user = await User.findById(_id)
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  const customer = await Customers.findOne({ user: _id })
+  if (!customer) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Customer not found')
+  }
+
+  const filteredPayload = Object.entries(payload).reduce(
+    (acc, [key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = value
+      }
+      return acc
+    },
+    {} as Record<string, any>
+  )
+
+  const updatedCustomer = await Customers.findOneAndUpdate(
+    { user: _id },
+    filteredPayload,
+    {
+      new: true,
+    }
+  )
+
+  return updatedCustomer
+}
+
+const updateUserProfileByAdmin = async (req: Request) => {
+  const { id } = req.params
+  const payload = req.body
+
+  if (req.file) {
+    payload.profileImage = req.file.path
+  }
+
+  const userToUpdate = await User.findById(id)
+  if (!userToUpdate) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  if (!['admin', 'customer'].includes(userToUpdate.role)) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'Only admin or customer can be updated'
+    )
+  }
+
+  const filteredPayload = Object.entries(payload).reduce(
+    (acc, [key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = value
+      }
+      return acc
+    },
+    {} as Record<string, any>
+  )
+
+  const updatedUser = await User.findByIdAndUpdate(id, filteredPayload, {
+    new: true,
+  }).select('-password')
+
+  return updatedUser
+}
+
+export const UserService = {
   registerUser,
   registerVendor,
   createAdmin,
@@ -296,4 +389,6 @@ export const UserSercive = {
   getMe,
   deleteUser,
   getAllAdmin,
+  updateMyProfile,
+  updateUserProfileByAdmin,
 }

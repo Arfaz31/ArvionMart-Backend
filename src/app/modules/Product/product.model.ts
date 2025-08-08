@@ -13,18 +13,7 @@ const ProductSchema = new Schema<IProduct>(
       required: [true, 'Product name is required'],
       trim: true,
     },
-    // slug: {
-    //   type: String,
-    //   required: [true, 'Slug is required'],
-    //   unique: true,
-    //   trim: true,
-    //   lowercase: true,
-    // },
-    // vendor: {
-    //   type: Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: 'Vendor',
-    // },
+
     description: {
       type: String,
       required: [true, 'Description is required'],
@@ -61,15 +50,24 @@ const ProductSchema = new Schema<IProduct>(
     },
     isActive: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     isNewArrival: {
       type: Boolean,
-      default: true,
+      default: false,
+    },
+    isFeatured: {
+      type: Boolean,
+      default: false,
     },
     variant: {
       type: [Schema.Types.ObjectId],
       ref: 'Variant',
+    },
+    barCodeNumber: {
+      type: Number,
+      required: true,
+      unique: true,
     },
   },
   {

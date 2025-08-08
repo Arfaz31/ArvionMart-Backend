@@ -26,7 +26,7 @@ router.post(
 
 router.patch(
   '/update/:id',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   updloadSingleImage('subcategory-Image'),
   validateRequestedFileData(
     SubcategoryValidation.UpdateSubcategoryValidationSchema
@@ -36,7 +36,7 @@ router.patch(
 
 router.delete(
   '/:id',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   SubcategoryController.deleteSubcategory
 )
 

@@ -9,22 +9,43 @@ import validateData from '../../middleware/validateRequest'
 
 const router = express.Router()
 
+router.post(
+  '/create-product',
+  // auth(UserRole.admin, UserRole.superAdmin),
+  validateData(ProductValidation.productSchemaValidation),
+  ProductController.createProduct
+)
+
 router.get(
   '/',
   // auth(...Object.values(UserRole)),
   ProductController.getAllProducts
 )
 
-router.get(
-  '/single/:id',
-  // auth(...Object.values(UserRole)),
-  ProductController.getSingleProduct
-)
+router.get('/featured', ProductController.getIsFeaturedProduct)
 
 router.get(
   '/new-arrivals',
   // auth(...Object.values(UserRole)),
   ProductController.getNewArrivals
+)
+
+router.get(
+  '/product-count',
+  auth(...Object.values(UserRole)),
+  ProductController.getProductsCountByVendor
+)
+
+router.get(
+  '/last-product',
+  auth(...Object.values(UserRole)),
+  ProductController.getLastProduct
+)
+
+router.get(
+  '/single/:id',
+  // auth(...Object.values(UserRole)),
+  ProductController.getSingleProduct
 )
 
 router.get(
@@ -39,42 +60,23 @@ router.get(
   ProductController.getProductsByBrand
 )
 
-// router.get(
-//   '/vendor/product',
-//   auth(UserRole.vendor),
-//   ProductController.getProductByVendor
-// )
-
 router.get(
-  '/product-count',
-  auth(...Object.values(UserRole)),
-  ProductController.getProductsCountByVendor
-)
-
-router.get(
-  '/last-product',
-  auth(...Object.values(UserRole)),
-  ProductController.getLastProduct
-)
-
-router.post(
-  '/create-product',
-  // auth(UserRole.admin, UserRole.superAdmin),
-  validateData(ProductValidation.productSchemaValidation),
-  ProductController.createProduct
+  '/:id/related',
+  // auth(...Object.values(UserRole)),
+  ProductController.getCategoryRelatedProducts
 )
 
 router.patch(
   '/update/:id',
-  auth(UserRole.admin, UserRole.superAdmin),
-  // updloadSingleImage('product-Image'),
+  // auth(UserRole.admin, UserRole.superAdmin),
+
   validateRequestedFileData(ProductValidation.updateProductSchemaValidation),
   ProductController.updateProductIntoDB
 )
 
 router.delete(
   '/delete/:id',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   ProductController.deleteProduct
 )
 

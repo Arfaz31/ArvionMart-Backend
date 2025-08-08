@@ -1,12 +1,12 @@
 import catchAsync from '../../utils/catchAsync'
 import sendResponse from '../../utils/sendResponse'
 import httpStatus from 'http-status'
-import { UserSercive } from './user.service'
+import { UserService } from './user.service'
 
 const register = catchAsync(async (req, res) => {
   const { password, customers } = req.body
 
-  const result = await UserSercive.registerUser(password, customers)
+  const result = await UserService.registerUser(password, customers)
   if (result) {
     const { refreshToken } = result
     res.cookie('refreshToken', refreshToken, {
@@ -23,8 +23,7 @@ const register = catchAsync(async (req, res) => {
 })
 
 const createAdminIntoDB = catchAsync(async (req, res) => {
-  const { password, admin } = req.body
-  const result = await UserSercive.createAdmin(password, admin)
+  const result = await UserService.createAdmin(req.body)
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     message: 'Admin created successfully',
@@ -34,7 +33,7 @@ const createAdminIntoDB = catchAsync(async (req, res) => {
 
 //get all admin
 const getAllAdminFromDB = catchAsync(async (req, res) => {
-  const result = await UserSercive.getAllAdmin(req.query)
+  const result = await UserService.getAllAdmin(req.query)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Admin get successfully',
@@ -46,7 +45,7 @@ const getAllAdminFromDB = catchAsync(async (req, res) => {
 //VENDOR REGISTRATION
 const vendorRegister = catchAsync(async (req, res) => {
   const { password, vendor } = req.body
-  const result = await UserSercive.registerVendor(password, vendor)
+  const result = await UserService.registerVendor(password, vendor)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -56,18 +55,20 @@ const vendorRegister = catchAsync(async (req, res) => {
 })
 
 const getAllCustomers = catchAsync(async (req, res) => {
-  const result = await UserSercive.getAllCustomersFromDB()
+  const result = await UserService.getAllCustomersFromDB(req.query)
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: 'Customer get successfully',
-    data: result,
+    message: 'Customers fetched successfully',
+    meta: result.count,
+    data: result.customerQuery,
   })
 })
 
 const getMeFromDB = catchAsync(async (req, res) => {
   const { _id } = req.user
 
-  const result = await UserSercive.getMe(_id)
+  const result = await UserService.getMe(_id)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Profile get successfully',
@@ -77,10 +78,30 @@ const getMeFromDB = catchAsync(async (req, res) => {
 
 const deleteUser = catchAsync(async (req, res) => {
   const { id } = req.params
-  const result = await UserSercive.deleteUser(id)
+  const result = await UserService.deleteUser(id)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'User deleted successfully',
+    data: result,
+  })
+})
+
+const updateMyProfile = catchAsync(async (req, res) => {
+  const result = await UserService.updateMyProfile(req)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Profile updated successfully',
+    data: result,
+  })
+})
+
+const updateUserProfileByAdmin = catchAsync(async (req, res) => {
+  const result = await UserService.updateUserProfileByAdmin(req)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'User profile updated successfully',
     data: result,
   })
 })
@@ -93,4 +114,6 @@ export const UserController = {
   getMeFromDB,
   deleteUser,
   getAllAdminFromDB,
+  updateMyProfile,
+  updateUserProfileByAdmin,
 }

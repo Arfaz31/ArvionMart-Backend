@@ -12,13 +12,43 @@ const createOrderIntoDB = catchAsync(async (req, res) => {
   })
 })
 
-const getOrderFromBD = catchAsync(async (req, res) => {
-  const result = await OrderService.getOrders(req.query)
+const createOrderByAdminIntoDB = catchAsync(async (req, res) => {
+  const { password, customer, order } = req.body
+  const result = await OrderService.createOrderByAdmin(
+    password,
+    customer,
+    order
+  )
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Order created successfully by admin',
+    data: result,
+  })
+})
+
+
+
+const getAllOrdersInfoFromBD = catchAsync(async (req, res) => {
+  const result = await OrderService.getAllOrdersInfo(req.query)
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Order get successfully',
-    meta: result.count,
-    data: result.result,
+    meta: result.meta,
+    data: {
+      pendingOrderData: result.pendingOrderData,
+      shippedOrderData: result.shippedOrderData,
+      deliveredOrderData: result.deliveredOrderData,
+      cancelledOrderData: result.cancelledOrderData,
+      totalOrderCount: result.totalOrderCount,
+      totalPendingOrderCount: result.totalPendingOrderCount,
+      totalShippedOrderCount: result.totalShippedOrderCount,
+      totalDeliveredOrderCount: result.totalDeliveredOrderCount,
+      totalCancelledOrderCount: result.totalCancelledOrderCount,
+      totalSales: result.totalSales,
+      totalProfit: result.totalProfit,
+    },
   })
 })
 
@@ -33,16 +63,6 @@ const updateOrderDeliverStatus = catchAsync(async (req, res) => {
   })
 })
 
-// get customer data
-// const getCustomerOrder = catchAsync(async (req, res) => {
-//   const result = await OrderService.getOrderCustomerFromDB(req)
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     message: 'Customer order get successfully',
-//     meta: result.count,
-//     data: result.builderQuery,
-//   })
-// })
 
 const getMyOrders = catchAsync(async (req, res) => {
   const userId = req.user._id
@@ -97,23 +117,39 @@ const reviewCancelRequest = catchAsync(async (req, res) => {
   })
 })
 
-const getReports = catchAsync(async (req, res) => {
-  const reportData = await OrderService.getReports()
+const getCancelRequestOrderData = catchAsync(async (req, res) => {
+  const result = await OrderService.getCancelRequestOrderData(req.query)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: 'Order report fetched successfully',
-    data: reportData,
+    message: 'Cancelled request orders fetched successfully',
+    meta: result.count,
+    data: result.result,
+  })
+})
+
+const updateOrder = catchAsync(async (req, res) => {
+  const orderId = req.params.id
+  const updatePayload = req.body
+
+  const updatedOrder = await OrderService.updateOrder(orderId, updatePayload)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Order updated successfully',
+    data: updatedOrder,
   })
 })
 
 export const OrderController = {
   createOrderIntoDB,
-  getOrderFromBD,
-  updateOrderDeliverStatus,
+  createOrderByAdminIntoDB,
+  getAllOrdersInfoFromBD,
   getMyOrders,
   getSingleOrder,
   requestCancelOrder,
   reviewCancelRequest,
-  getReports,
+  getCancelRequestOrderData,
+  updateOrder,
+  updateOrderDeliverStatus
 }

@@ -1,12 +1,20 @@
-import { model, Schema } from 'mongoose'
-import { IPromotionalBanner } from './promotionalBanner.interface'
+import { Schema } from 'mongoose'
+import { model } from 'mongoose'
+import { IStory } from './story.interface'
 
-const PromotionalBannerSchema = new Schema<IPromotionalBanner>(
+const StorySchema = new Schema<IStory>(
   {
+    order: {
+      type: Number,
+      required: [true, 'Order is required'],
+      unique: true,
+    },
+    title: {
+      type: String,
+    },
     image: {
       type: String,
-      required: true,
-      trim: true,
+      required: [true, 'Image URL is required'],
     },
     categoryId: {
       type: Schema.Types.ObjectId,
@@ -28,7 +36,7 @@ const PromotionalBannerSchema = new Schema<IPromotionalBanner>(
       ref: 'Product',
       required: false,
     },
-    brandId: {
+    brnadId: {
       type: Schema.Types.ObjectId,
       ref: 'Brand',
       required: false,
@@ -48,7 +56,4 @@ const PromotionalBannerSchema = new Schema<IPromotionalBanner>(
   }
 )
 
-export const PromotionalBanner = model<IPromotionalBanner>(
-  'PromotionalBanner',
-  PromotionalBannerSchema
-)
+export const Story = model<IStory>('Story', StorySchema)

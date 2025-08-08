@@ -12,6 +12,12 @@ import { Vendor } from '../Vendor/vendor.model'
 import { SecondarySubcategory } from '../SecondarySubcategory/SecondarySubcategory.model'
 import { generateSku } from './product.utility'
 
+const generate13DigitBarcode = (): number => {
+  const random12Digits = Math.floor(Math.random() * 1_000_000_000_000) // max 12 digits
+  const barcode = Number('8' + random12Digits.toString().padStart(12, '0'))
+  return barcode
+}
+
 const createProductIntoDB = async (req: Request) => {
   const payload = req.body
 
@@ -64,6 +70,8 @@ const createProductIntoDB = async (req: Request) => {
   // ✅ Generate SKU & Product ID
   payload.sku = await generateSku(payload.category)
 
+  payload.barCodeNumber = generate13DigitBarcode()
+
   // ✅ Create product
   const result = await Product.create(payload)
   return result
@@ -71,7 +79,7 @@ const createProductIntoDB = async (req: Request) => {
 
 //get all product
 const getAllProducts = async (query: Record<string, unknown>) => {
-  const searchAbleFields = ['productName', 'description']
+  const searchAbleFields = ['productName', 'description', 'barCodeNumber']
   const filters: Record<string, any> = { isActive: true }
 
   // 1️⃣ Handle Variant-Based Filtering (color, size, minPrice, maxPrice)
@@ -84,6 +92,11 @@ const getAllProducts = async (query: Record<string, unknown>) => {
   if (query.isNewArrival !== undefined) {
     filters.isNewArrival =
       query.isNewArrival === 'true' || query.isNewArrival === true
+  }
+
+  if (query.isFeatured !== undefined) {
+    filters.isFeatured =
+      query.isFeatured === 'true' || query.isFeatured === true
   }
 
   if (query.size) {
@@ -191,6 +204,20 @@ const getAllProducts = async (query: Record<string, unknown>) => {
     meta,
     result,
   }
+}
+
+const getIsFeaturedProduct = async () => {
+  const result = await Product.find({
+    isFeatured: true,
+    isActive: true,
+  })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('secondarySubcategory')
+    .populate('variant')
+
+  return result
 }
 
 //getproductBy vendor
@@ -395,9 +422,17 @@ const deleteProduct = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Product does not exist')
   }
 
+  const variant = await Variant.find({ productId: _id })
+  if (variant && variant.length > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete a product with variants'
+    )
+  }
+
   const result = await Product.findByIdAndUpdate(
     _id,
-    { isDeleted: true, isActive: false },
+    { isActive: false },
     {
       new: true,
     }
@@ -456,9 +491,30 @@ const getTotalProductCount = async (req: Request) => {
   return result
 }
 
+const getCategoryRelatedProductsFromDB = async (excludeProductId: string) => {
+  const product = await Product.findById(excludeProductId)
+
+  if (!product) {
+    throw new Error('product not found')
+  }
+
+  const relatedProducts = await Product.find({
+    category: product.category,
+    _id: { $ne: excludeProductId },
+  })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('variant')
+  // Find all products with the same category ID, except for the product with this specific ID.
+
+  return relatedProducts
+}
+
 export const ProductService = {
   createProductIntoDB,
   getAllProducts,
+  getIsFeaturedProduct,
   getSingleProduct,
   updateProduct,
   deleteProduct,
@@ -468,4 +524,5 @@ export const ProductService = {
   // getProductByVendor,
   getLastProduct,
   getTotalProductCount,
+  getCategoryRelatedProductsFromDB,
 }

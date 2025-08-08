@@ -20,8 +20,8 @@ const createVariantIntoDB = async (req: Request) => {
     const files = req.files as { [fieldname: string]: CustomFile[] }
 
     // Handle uploaded images
-    if (files && files['variant-Image']) {
-      payload.image = files['variant-Image'].map(
+    if (files && files['variant-images']) {
+      payload.image = files['variant-images'].map(
         (file: CustomFile) => file.path
       )
     }
@@ -122,6 +122,38 @@ const getSingleVariant = async (id: string) => {
   return result
 }
 
+// const updateVariant = async (req: Request) => {
+//   const { id: _id } = req.params
+//   const payload = req.body
+
+//   const isExist = await Variant.findById(_id)
+//   if (!isExist) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'Variant does not exist')
+//   }
+
+//   if (req.files && 'variant-images' in req.files) {
+//     const files = req.files['variant-images'] as Express.Multer.File[] // Access the array using the key
+//     payload.image = files.map(file => file.path)
+//   }
+
+//   // Filter out undefined/null/empty values
+//   const filteredPayload = Object.entries(payload).reduce(
+//     (acc, [key, value]) => {
+//       if (value !== undefined && value !== null && value !== '') {
+//         acc[key] = value
+//       }
+//       return acc
+//     },
+//     {} as Record<string, any>
+//   )
+
+//   const result = await Variant.findOneAndUpdate({ _id }, filteredPayload, {
+//     new: true,
+//   }).populate('productId')
+
+//   return result
+// }
+
 const updateVariant = async (req: Request) => {
   const { id: _id } = req.params
   const payload = req.body
@@ -131,13 +163,62 @@ const updateVariant = async (req: Request) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Variant does not exist')
   }
 
-  if (req.files && 'variant-image' in req.files) {
-    const files = req.files['variant-image'] as Express.Multer.File[] // Access the array using the key
-    payload.image = files.map(file => file.path)
+  // Parse the data if it's coming as FormData
+  let parsedData = payload
+  if (typeof payload.data === 'string') {
+    try {
+      parsedData = JSON.parse(payload.data)
+    } catch (error) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid JSON data')
+    }
   }
 
+  // Handle image updates
+  let finalImages: string[] = []
+
+  // Start with existing images that weren't removed
+  if (parsedData.existingImages && Array.isArray(parsedData.existingImages)) {
+    finalImages = [...parsedData.existingImages]
+  } else if (isExist.image) {
+    // If no existingImages specified, keep all current images
+    finalImages = [...isExist.image]
+  }
+
+  // Remove images that were marked for removal
+  if (parsedData.removedImages && Array.isArray(parsedData.removedImages)) {
+    finalImages = finalImages.filter(
+      img => !parsedData.removedImages.includes(img)
+    )
+
+    // Optional: Delete removed image files from storage
+    // parsedData.removedImages.forEach(async (imageUrl) => {
+    //   try {
+    //     // Add your file deletion logic here
+    //     // Example: await deleteFileFromStorage(imageUrl)
+    //   } catch (error) {
+    //     console.error('Error deleting image:', error)
+    //   }
+    // })
+  }
+
+  // Add new uploaded images
+  if (req.files && 'variant-images' in req.files) {
+    const files = req.files['variant-images'] as Express.Multer.File[]
+    const newImagePaths = files.map(file => file.path)
+    finalImages = [...finalImages, ...newImagePaths]
+  }
+
+  // Set the final image array
+  if (finalImages.length > 0) {
+    parsedData.image = finalImages
+  }
+
+  // Clean up the data object
+  delete parsedData.existingImages
+  delete parsedData.removedImages
+
   // Filter out undefined/null/empty values
-  const filteredPayload = Object.entries(payload).reduce(
+  const filteredPayload = Object.entries(parsedData).reduce(
     (acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         acc[key] = value

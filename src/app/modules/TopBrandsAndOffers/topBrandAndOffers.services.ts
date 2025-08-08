@@ -45,11 +45,15 @@ const createBrandOffer = async (req: Request) => {
 }
 
 const getAllBrandOffers = async (query: Record<string, unknown>) => {
+  const updatedQuery = {
+    ...query,
+    sort: '-status -createdAt',
+  }
   const brandOfferQuery = new QueryBuilder(
     BrandOffer.find({ isDeleted: false })
       .populate('brandId')
       .populate('productId'),
-    query
+    updatedQuery
   )
     .search(searchableFields)
     .filter()
@@ -106,11 +110,7 @@ const updateBrandOffer = async (req: Request) => {
 }
 
 const deleteBrandOffer = async (id: string) => {
-  const result = await BrandOffer.findByIdAndUpdate(
-    id,
-    { isDeleted: true, status: 'INACTIVE' },
-    { new: true }
-  )
+  const result = await BrandOffer.findByIdAndDelete(id)
   return result
 }
 

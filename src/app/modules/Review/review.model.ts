@@ -11,7 +11,7 @@ const reviewSchema = new Schema<IReview>({
   customerId: {
     type: Schema.Types.ObjectId,
     required: true,
-    ref: 'User',
+    ref: 'Customer',
   },
   rating: {
     type: Number,

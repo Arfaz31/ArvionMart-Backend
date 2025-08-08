@@ -4,7 +4,7 @@ import { ReviewService } from './review.service'
 import httpStatus from 'http-status'
 
 const createReviewIntoDB = catchAsync(async (req, res) => {
-  const result = await ReviewService.createReview(req.body)
+  const result = await ReviewService.createReview(req)
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     message: 'Review created successfully',
@@ -14,6 +14,8 @@ const createReviewIntoDB = catchAsync(async (req, res) => {
 
 const getReviewsByProduct = catchAsync(async (req, res) => {
   const productId = req.params.productId
+  // console.log('productId', productId)
+
   const result = await ReviewService.getReviewsByProduct(productId)
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -22,12 +24,23 @@ const getReviewsByProduct = catchAsync(async (req, res) => {
   })
 })
 
+const getAllReviews = catchAsync(async (req, res) => {
+  const result = await ReviewService.getAllReviews(req.query)
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Reviews fetched successfully',
+    meta: result.count,
+    data: result.result,
+  })
+})
+
 const updateReviewByCustomer = catchAsync(async (req, res) => {
   const reviewId = req.params.reviewId
-  const customerId = req.user._id
+  const user = req.user
   const result = await ReviewService.updateReviewByCustomer(
     reviewId,
-    customerId,
+    user,
     req.body
   )
   sendResponse(res, {
@@ -56,6 +69,7 @@ const deleteReviewByCustomer = catchAsync(async (req, res) => {
 export const ReviewController = {
   createReviewIntoDB,
   getReviewsByProduct,
+  getAllReviews,
   updateReviewByCustomer,
   deleteReviewByCustomer,
 }
