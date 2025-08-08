@@ -16,6 +16,8 @@ import { PromoBannerRoutes } from '../modules/PromoCard/promoCard.routes'
 import { ReviewRoutes } from '../modules/Review/review.routes'
 import { BrandOfferRoutes } from '../modules/TopBrandsAndOffers/topBrandAndOffers.route'
 import { StoryRoutes } from '../modules/Story/story.route'
+import path from 'path'
+import { DashboardOverviewRoutes } from '../modules/Dashboardoverview/dashboardoverview.routes'
 
 const middlewareRoutes = Router()
 
@@ -87,6 +89,10 @@ const router = [
   {
     path: '/story',
     routes: StoryRoutes,
+  },
+  {
+    path: '/dashboradoverview',
+    routes: DashboardOverviewRoutes,
   },
 ]
 
