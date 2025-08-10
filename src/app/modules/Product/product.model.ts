@@ -60,6 +60,26 @@ const ProductSchema = new Schema<IProduct>(
       type: Boolean,
       default: false,
     },
+    isTrending: {
+      type: Boolean,
+      default: false,
+    },
+    isLatest: {
+      type: Boolean,
+      default: false,
+    },
+    isBestSelling: {
+      type: Boolean,
+      default: false,
+    },
+    isMostViewed: {
+      type: Boolean,
+      default: false,
+    },
+    isFlashSale: {
+      type: Boolean,
+      default: false,
+    },
     variant: {
       type: [Schema.Types.ObjectId],
       ref: 'Variant',

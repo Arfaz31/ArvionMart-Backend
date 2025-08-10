@@ -79,6 +79,51 @@ const getIsFeaturedProduct = catchAsync(async (req, res) => {
   })
 })
 
+const getIsTrendingProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.getIsTrendingProduct()
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Trending products retrieved successfully',
+    data: result,
+  })
+})
+
+const getIsLatestProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.getIsLatestProduct()
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Latest products retrieved successfully',
+    data: result,
+  })
+})
+
+const getIsBestSellingProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.getIsBestSellingProduct()
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Best selling products retrieved successfully',
+    data: result,
+  })
+})
+
+const getIsMostViewedProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.getIsMostViewedProduct()
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Most viewed products retrieved successfully',
+    data: result,
+  })
+})
+
+const getIsFlashSaleProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.getIsFlashSaleProduct()
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Flash sale products retrieved successfully',
+    data: result,
+  })
+})
+
 const getNewArrivals = catchAsync(async (req, res) => {
   const result = await ProductService.getNewArrivals()
   sendResponse(res, {
@@ -137,6 +182,11 @@ export const ProductController = {
   createProduct,
   getAllProducts,
   getIsFeaturedProduct,
+  getIsTrendingProduct,
+  getIsLatestProduct,
+  getIsBestSellingProduct,
+  getIsMostViewedProduct,
+  getIsFlashSaleProduct,
   getSingleProduct,
   updateProductIntoDB,
   deleteProduct,

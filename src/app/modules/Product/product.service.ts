@@ -20,6 +20,7 @@ const generate13DigitBarcode = (): number => {
 
 const createProductIntoDB = async (req: Request) => {
   const payload = req.body
+  console.log(payload)
 
   // ✅ Validate Category
   if (payload.category) {
@@ -97,6 +98,30 @@ const getAllProducts = async (query: Record<string, unknown>) => {
   if (query.isFeatured !== undefined) {
     filters.isFeatured =
       query.isFeatured === 'true' || query.isFeatured === true
+  }
+
+  if (query.isTrending !== undefined) {
+    filters.isTrending =
+      query.isTrending === 'true' || query.isTrending === true
+  }
+
+  if (query.isLatest !== undefined) {
+    filters.isLatest = query.isLatest === 'true' || query.isLatest === true
+  }
+
+  if (query.isBestSelling !== undefined) {
+    filters.isBestSelling =
+      query.isBestSelling === 'true' || query.isBestSelling === true
+  }
+
+  if (query.isMostViewed !== undefined) {
+    filters.isMostViewed =
+      query.isMostViewed === 'true' || query.isMostViewed === true
+  }
+
+  if (query.isFlashSale !== undefined) {
+    filters.isFlashSale =
+      query.isFlashSale === 'true' || query.isFlashSale === true
   }
 
   if (query.size) {
@@ -209,6 +234,76 @@ const getAllProducts = async (query: Record<string, unknown>) => {
 const getIsFeaturedProduct = async () => {
   const result = await Product.find({
     isFeatured: true,
+    isActive: true,
+  })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('secondarySubcategory')
+    .populate('variant')
+
+  return result
+}
+
+const getIsTrendingProduct = async () => {
+  const result = await Product.find({
+    isTrending: true,
+    isActive: true,
+  })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('secondarySubcategory')
+    .populate('variant')
+
+  return result
+}
+
+const getIsLatestProduct = async () => {
+  const result = await Product.find({
+    isLatest: true,
+    isActive: true,
+  })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('secondarySubcategory')
+    .populate('variant')
+
+  return result
+}
+
+const getIsBestSellingProduct = async () => {
+  const result = await Product.find({
+    isBestSelling: true,
+    isActive: true,
+  })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('secondarySubcategory')
+    .populate('variant')
+
+  return result
+}
+
+const getIsMostViewedProduct = async () => {
+  const result = await Product.find({
+    isMostViewed: true,
+    isActive: true,
+  })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('secondarySubcategory')
+    .populate('variant')
+
+  return result
+}
+
+const getIsFlashSaleProduct = async () => {
+  const result = await Product.find({
+    isFlashSale: true,
     isActive: true,
   })
     .populate('brand')
@@ -515,6 +610,11 @@ export const ProductService = {
   createProductIntoDB,
   getAllProducts,
   getIsFeaturedProduct,
+  getIsTrendingProduct,
+  getIsLatestProduct,
+  getIsBestSellingProduct,
+  getIsMostViewedProduct,
+  getIsFlashSaleProduct,
   getSingleProduct,
   updateProduct,
   deleteProduct,
