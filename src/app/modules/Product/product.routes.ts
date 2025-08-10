@@ -23,6 +23,11 @@ router.get(
 )
 
 router.get('/featured', ProductController.getIsFeaturedProduct)
+router.get('/trending', ProductController.getIsTrendingProduct)
+router.get('/latest', ProductController.getIsLatestProduct)
+router.get('/bestselling', ProductController.getIsBestSellingProduct)
+router.get('/mostviewed', ProductController.getIsMostViewedProduct)
+router.get('/flashsale', ProductController.getIsFlashSaleProduct)
 
 router.get(
   '/new-arrivals',

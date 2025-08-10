@@ -18,6 +18,11 @@ const productSchemaValidation = z.object({
 
   isNewArrival: z.boolean().default(false),
   isFeatured: z.boolean().default(false),
+  isTrending: z.boolean().default(false),
+  isLatest: z.boolean().default(false),
+  isBestSelling: z.boolean().default(false),
+  isMostViewed: z.boolean().default(false),
+  isFlashSale: z.boolean().default(false),
 })
 
 export const updateProductSchemaValidation = z.object({
@@ -49,6 +54,11 @@ export const updateProductSchemaValidation = z.object({
 
   isNewArrival: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
+  isTrending: z.boolean().default(false),
+  isLatest: z.boolean().default(false),
+  isBestSelling: z.boolean().default(false),
+  isMostViewed: z.boolean().default(false),
+  isFlashSale: z.boolean().default(false),
 })
 
 export const ProductValidation = {
