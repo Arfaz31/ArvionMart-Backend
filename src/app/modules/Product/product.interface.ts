@@ -15,4 +15,5 @@ export interface IProduct {
   isFeatured?: boolean
   variant?: Types.ObjectId[]
   barCodeNumber: number
+  bestSellingProduct: number
 }

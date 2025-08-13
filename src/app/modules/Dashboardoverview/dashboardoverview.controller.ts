@@ -62,6 +62,15 @@ const getFullYearSales = catchAsync(async (req, res) => {
   })
 })
 
+const getBestSellingProduct = catchAsync(async (req, res) => {
+  const result = await DashboardOverviewService.getBestSellingProduct()
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Best selling product fetched successfully',
+    data: result,
+  })
+})
+
 export const DashboardOverviewController = {
   todayOrderAmountFromDB,
   totalOrderAmountFromDB,
@@ -69,4 +78,5 @@ export const DashboardOverviewController = {
   previousMonthOrderAmountFromDB,
   totalOrderFromDB,
   getFullYearSales,
+  getBestSellingProduct,
 }

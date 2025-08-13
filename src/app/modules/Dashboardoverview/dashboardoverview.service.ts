@@ -1,5 +1,6 @@
 import { endOfMonth, startOfMonth, subMonths } from 'date-fns'
 import { Order } from '../Order/order.model'
+import { Product } from '../Product/product.model'
 
 //today sales
 const todayOrderAmount = async () => {
@@ -19,15 +20,43 @@ const todayOrderAmount = async () => {
       },
     },
     {
-      $group: {
-        _id: null,
-        totalAmount: { $sum: '$totalPrice' },
-        count: { $sum: 1 }, // Optional: if you want to count orders too
+      $facet: {
+        summary: [
+          {
+            $group: {
+              _id: null,
+              totalAmount: { $sum: '$totalPrice' },
+              count: { $sum: 1 },
+            },
+          },
+        ],
+        orders: [
+          {
+            $project: {
+              _id: 1,
+              totalPrice: 1,
+              createdAt: 1,
+              customerInfo: 1,
+              orderNumber: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $project: {
+        totalAmount: {
+          $ifNull: [{ $arrayElemAt: ['$summary.totalAmount', 0] }, 0],
+        },
+        count: { $ifNull: [{ $arrayElemAt: ['$summary.count', 0] }, 0] },
+        orders: '$orders',
       },
     },
   ])
 
-  return result.length > 0 ? result[0] : { totalAmount: 0, count: 0 }
+  return result.length > 0
+    ? result[0]
+    : { totalAmount: 0, count: 0, orders: [] }
 }
 
 //monthly sales
@@ -211,6 +240,36 @@ const getYearlySalesData = async () => {
   return monthlySales
 }
 
+//get bestselling product
+const getBestSellingProduct = async () => {
+  //populate variant data
+  const result = await Product.aggregate([
+    {
+      $match: {
+        bestSellingProduct: { $gte: 2 },
+      },
+    },
+    {
+      $sort: {
+        bestSellingProduct: -1,
+      },
+    },
+    {
+      $lookup: {
+        from: 'variants',
+        localField: 'variant',
+        foreignField: '_id',
+        as: 'variant',
+      },
+    },
+    {
+      $limit: 10,
+    },
+  ])
+
+  return result.length > 0 ? result : []
+}
+
 export const DashboardOverviewService = {
   todayOrderAmount,
   totalOrderAmount,
@@ -218,4 +277,5 @@ export const DashboardOverviewService = {
   previousMonthOrderAmount,
   totalOrderCount,
   getYearlySalesData,
+  getBestSellingProduct,
 }

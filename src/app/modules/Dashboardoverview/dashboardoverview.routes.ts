@@ -27,4 +27,9 @@ router.get('/total-order', DashboardOverviewController.totalOrderFromDB)
 
 router.get('/fullyearsales', DashboardOverviewController.getFullYearSales)
 
+router.get(
+  '/best-selling-product',
+  DashboardOverviewController.getBestSellingProduct
+)
+
 export const DashboardOverviewRoutes = router
