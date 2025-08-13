@@ -17,6 +17,7 @@ import { ReviewRoutes } from '../modules/Review/review.routes'
 import { BrandOfferRoutes } from '../modules/TopBrandsAndOffers/topBrandAndOffers.route'
 import { StoryRoutes } from '../modules/Story/story.route'
 import { SideBannerRoutes } from '../modules/SideBanner/sidebanner.route'
+import { PointsOfferRoutes } from '../modules/PointsOffer/pointsoffer.route'
 
 const middlewareRoutes = Router()
 
@@ -92,6 +93,10 @@ const router = [
   {
     path: '/sidebanner',
     routes: SideBannerRoutes,
+  },
+  {
+    path: '/points-offer',
+    routes: PointsOfferRoutes,
   },
 ]
 

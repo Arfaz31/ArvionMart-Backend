@@ -35,6 +35,8 @@ const CustomerInfoValidationSchema = z.object({
 export const CreateOrderValidationSchema = z.object({
   customerInfo: CustomerInfoValidationSchema,
   orderItems: z.array(OrderItemValidationSchema).min(1),
+  deductPoints: z.number().optional(),
+  addPoints: z.number().optional(),
   paymentMethod: z.string().min(1),
   shippingPrice: z.number().min(0),
   totalPrice: z.number().min(0),
@@ -44,6 +46,8 @@ export const CreateOrderValidationSchema = z.object({
 export const UpdateOrderValidationSchema = z.object({
   customerInfo: CustomerInfoValidationSchema.partial().optional(),
   orderItems: z.array(OrderItemValidationSchema).optional(),
+  deductPoints: z.number().optional(),
+  addPoints: z.number().optional(),
   paymentMethod: z.string().optional(),
   shippingPrice: z.number().min(0).optional(),
   totalPrice: z.number().min(0).optional(),
@@ -73,6 +77,8 @@ export const createOrderValidationSchemaForAdmin = z.object({
   order: z.object({
     customerInfo: CustomerInfoValidationSchema,
     orderItems: z.array(OrderItemValidationSchema).min(1),
+    deductPoints: z.number().optional(),
+    addPoints: z.number().optional(),
     paymentMethod: z.string().min(1, 'Payment method is required'),
     shippingPrice: z.number().min(0),
     totalPrice: z.number().min(0),

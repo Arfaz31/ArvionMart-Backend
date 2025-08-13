@@ -112,6 +112,16 @@ const orderSchema = new Schema<IOrder>(
       type: [orderItemSchema],
       required: true,
     },
+    deductPoints: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    addPoints: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
     transactionId: {
       type: String,
     },

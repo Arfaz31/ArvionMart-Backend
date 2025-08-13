@@ -17,11 +17,7 @@ router.get(
   OrderController.getAllOrdersInfoFromBD
 )
 
-router.get(
-  '/my-orders',
-  // auth(UserRole.superAdmin, UserRole.admin, UserRole.customer),
-  OrderController.getMyOrders
-)
+router.get('/my-orders', auth(UserRole.customer), OrderController.getMyOrders)
 
 router.get('/cancel-requests', OrderController.getCancelRequestOrderData)
 

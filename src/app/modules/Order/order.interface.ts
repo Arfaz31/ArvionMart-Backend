@@ -32,6 +32,8 @@ export interface IOrder {
   orderNumber: string
   customerInfo: TCustomerInfo
   orderItems: TOrderItem[]
+  deductPoints?: number
+  addPoints?: number
   transactionId?: string
   paymentMethod: string
   shippingPrice: number

@@ -1,5 +1,7 @@
 import { Router } from 'express'
 import { PointsOfferController } from './pointsoffer.controller'
+import validateData from '../../middleware/validateRequest'
+import { createPointsOfferSchema } from './PointsOffer.validation'
 
 const router = Router()
 
@@ -12,6 +14,7 @@ router.get(
 router.post(
   '/create-points-offer',
   // auth(UserRole.vendor, UserRole.manager),
+  validateData(createPointsOfferSchema),
   PointsOfferController.createPointsOffer
 )
 
