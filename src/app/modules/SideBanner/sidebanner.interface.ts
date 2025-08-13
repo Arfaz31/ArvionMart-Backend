@@ -1,7 +1,7 @@
 import { Types } from 'mongoose'
 
 export interface ISideBanner {
-  orderr: number
+  order: number
   image: string
   categoryId?: Types.ObjectId
   subcategoryId?: Types.ObjectId

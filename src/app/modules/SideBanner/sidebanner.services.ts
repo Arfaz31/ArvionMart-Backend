@@ -7,7 +7,6 @@ import httpStatus from 'http-status'
 
 const createSideBanner = async (req: Request) => {
   const payload = req.body
-  console.log(payload)
 
   const file = req.file
 
