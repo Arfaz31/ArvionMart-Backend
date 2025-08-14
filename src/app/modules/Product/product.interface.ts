@@ -13,7 +13,13 @@ export interface IProduct {
   isActive: boolean
   isNewArrival?: boolean
   isFeatured?: boolean
+  isTrending?: boolean
+  isLatest?: boolean
+  isBestSelling?: boolean
+  isMostViewed?: boolean
+  isFlashSale?: boolean
   variant?: Types.ObjectId[]
   barCodeNumber: number
   bestSellingProduct: number
+  points?: number
 }

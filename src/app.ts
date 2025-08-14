@@ -17,7 +17,11 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://arvionmart.vercel.app'],
+    origin: [
+      'http://localhost:3000',
+      'https://arvion-mart-frontend-rho.vercel.app',
+      'https://arvionmart.vercel.app',
+    ],
     credentials: true,
   })
 )

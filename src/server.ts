@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import config from './app/config'
 import { Server } from 'http'
 import seedSuperAdmin from './app/DB'
-//import Logger from './app/core/Logger'
+// import Logger from './app/core/Logger'
 
 const port = process.env.PORT || config.port
 

@@ -16,8 +16,9 @@ import { PromoBannerRoutes } from '../modules/PromoCard/promoCard.routes'
 import { ReviewRoutes } from '../modules/Review/review.routes'
 import { BrandOfferRoutes } from '../modules/TopBrandsAndOffers/topBrandAndOffers.route'
 import { StoryRoutes } from '../modules/Story/story.route'
-import path from 'path'
 import { DashboardOverviewRoutes } from '../modules/Dashboardoverview/dashboardoverview.routes'
+import { SideBannerRoutes } from '../modules/SideBanner/sidebanner.route'
+import { PointsOfferRoutes } from '../modules/PointsOffer/pointsoffer.route'
 
 const middlewareRoutes = Router()
 
@@ -93,6 +94,14 @@ const router = [
   {
     path: '/dashboradoverview',
     routes: DashboardOverviewRoutes,
+  },
+  {
+    path: '/sidebanner',
+    routes: SideBannerRoutes,
+  },
+  {
+    path: '/points-offer',
+    routes: PointsOfferRoutes,
   },
 ]
 

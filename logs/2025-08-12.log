@@ -1,2 +1,6 @@
+<<<<<<< HEAD:logs/2025-08-12.log
 {"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-11T18:51:44.089Z"}
 {"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-12T15:03:04.683Z"}
+=======
+{"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-12T13:49:51.506Z"}
+>>>>>>> 7f42b8d6164287696cd85eef797c7f6b47fd7753:LOG_FILES/2025-08-12.log
