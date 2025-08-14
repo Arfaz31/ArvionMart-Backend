@@ -26,6 +26,10 @@ const customerSchema = new Schema<ICustomer>(
     address: {
       type: String,
     },
+    totalPoints: {
+      type: Number,
+      default: 0,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

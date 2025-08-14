@@ -8,4 +8,5 @@ export interface ICustomer {
   profileImage?: string
   address: string
   isDeleted: boolean
+  totalPoints?: number
 }

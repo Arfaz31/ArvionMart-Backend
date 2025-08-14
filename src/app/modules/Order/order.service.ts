@@ -72,6 +72,24 @@ const createOrder = async (payload: IOrder) => {
 
       product.quantity = (product.quantity ?? 0) - item.quantity
 
+      const customerId = payload.customerInfo.customerId
+
+      if (customerId && payload.deductPoints && payload.deductPoints > 0) {
+        await Customers.findByIdAndUpdate(
+          customerId,
+          { $inc: { totalPoints: -payload.deductPoints } },
+          { new: true, session }
+        )
+      }
+
+      if (customerId && payload.addPoints && payload.addPoints > 0) {
+        await Customers.findByIdAndUpdate(
+          customerId,
+          { $inc: { totalPoints: payload.addPoints } },
+          { new: true, session }
+        )
+      }
+
       // Save updates
       await variant.save({ session })
       await product.save({ session })
@@ -197,6 +215,28 @@ const createOrderByAdmin = async (
       }
 
       product.quantity = (product.quantity ?? 0) - item.quantity
+
+      const customerId = customerPayload.user
+
+      if (
+        customerId &&
+        orderPayload.deductPoints &&
+        orderPayload.deductPoints > 0
+      ) {
+        await Customers.findByIdAndUpdate(
+          customerId,
+          { $inc: { totalPoints: -orderPayload.deductPoints } },
+          { new: true, session }
+        )
+      }
+
+      if (customerId && orderPayload.addPoints && orderPayload.addPoints > 0) {
+        await Customers.findByIdAndUpdate(
+          customerId,
+          { $inc: { totalPoints: orderPayload.addPoints } },
+          { new: true, session }
+        )
+      }
 
       await variant.save({ session })
       await product.save({ session })

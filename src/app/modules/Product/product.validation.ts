@@ -23,6 +23,7 @@ const productSchemaValidation = z.object({
   isBestSelling: z.boolean().default(false),
   isMostViewed: z.boolean().default(false),
   isFlashSale: z.boolean().default(false),
+  points: z.number().optional(),
 })
 
 export const updateProductSchemaValidation = z.object({
@@ -59,6 +60,7 @@ export const updateProductSchemaValidation = z.object({
   isBestSelling: z.boolean().default(false),
   isMostViewed: z.boolean().default(false),
   isFlashSale: z.boolean().default(false),
+  points: z.number().optional(),
 })
 
 export const ProductValidation = {
