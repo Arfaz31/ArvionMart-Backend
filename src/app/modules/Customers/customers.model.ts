@@ -5,12 +5,10 @@ const customerSchema = new Schema<ICustomer>(
   {
     fullName: {
       type: String,
-
       trim: true,
     },
     user: {
       type: Schema.Types.ObjectId,
-
       ref: 'User',
     },
     email: {

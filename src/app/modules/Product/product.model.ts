@@ -89,6 +89,10 @@ const ProductSchema = new Schema<IProduct>(
       required: true,
       unique: true,
     },
+    bestSellingProduct: {
+      type: Number,
+      default: 0,
+    },
     points: {
       type: Number,
       default: 0,

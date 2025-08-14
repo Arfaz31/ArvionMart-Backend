@@ -25,11 +25,7 @@ export const generateUserId = (name: string): string => {
 
 //REGISTER
 const registerUser = async (password: string, payload: ICustomer) => {
-  const userName = generateUserId(payload.fullName)
-
   const userData: Partial<IUser> = {
-    userId: userName,
-    email: payload.email,
     contactNumber: payload.contactNumber,
     password,
     role: UserRole.customer,
@@ -59,8 +55,7 @@ const registerUser = async (password: string, payload: ICustomer) => {
 
     const jwtPayload = {
       _id: createdUser[0]._id,
-      userId: createdUser[0].userId,
-      email: createdUser[0].email,
+      contactNumber: createdUser[0].contactNumber,
       role: createdUser[0].role,
     }
 
@@ -105,7 +100,6 @@ const createAdmin = async (payload: any) => {
   const userData: Partial<IUser> = {}
 
   //user-data
-  userData.userId = userName
   userData.email = payload.email
   userData.contactNumber = payload.contactNumber
   userData.password = payload.password
@@ -189,7 +183,6 @@ const registerVendor = async (password: string, payload: IVendor) => {
   payload.vendorId = await generateVendorId()
 
   const userData: Partial<IUser> = {
-    userId: payload.vendorId,
     email: payload.email,
     password,
     role: UserRole.vendor,

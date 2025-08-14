@@ -20,5 +20,6 @@ export interface IProduct {
   isFlashSale?: boolean
   variant?: Types.ObjectId[]
   barCodeNumber: number
+  bestSellingProduct: number
   points?: number
 }

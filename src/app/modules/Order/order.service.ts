@@ -39,31 +39,31 @@ const createOrder = async (payload: IOrder) => {
       }
 
       // Step 3: Handle size-based reduction
-      if (item.size) {
-        const sizeEntry = variant.size?.find(s => s.size === item.size)
-        if (!sizeEntry) {
-          throw new Error(
-            `Size "${item.size}" not found for variant ${variant._id}`
-          )
-        }
+      // if (item.size) {
+      //   const sizeEntry = variant.size?.find(s => s.size === item.size)
+      //   if (!sizeEntry) {
+      //     throw new Error(
+      //       `Size "${item.size}" not found for variant ${variant._id}`
+      //     )
+      //   }
 
-        if (sizeEntry.quantity < item.quantity) {
-          throw new Error(
-            `Not enough stock for size "${item.size}" in variant ${variant._id}`
-          )
-        }
+      //   if (sizeEntry.quantity < item.quantity) {
+      //     throw new Error(
+      //       `Not enough stock for size "${item.size}" in variant ${variant._id}`
+      //     )
+      //   }
 
-        sizeEntry.quantity -= item.quantity
-      } else {
-        // Step 4: Handle simple quantity reduction
-        if ((variant.quantity ?? 0) < item.quantity) {
-          throw new Error(
-            `Not enough variant quantity for variant ${variant._id}`
-          )
-        }
+      //   sizeEntry.quantity -= item.quantity
+      // } else {
+      //   // Step 4: Handle simple quantity reduction
+      //   if ((variant.quantity ?? 0) < item.quantity) {
+      //     throw new Error(
+      //       `Not enough variant quantity for variant ${variant._id}`
+      //     )
+      //   }
 
-        variant.quantity = (variant.quantity ?? 0) - item.quantity
-      }
+      //   variant.quantity = (variant.quantity ?? 0) - item.quantity
+      // }
 
       // Step 5: Update main product quantity
       if ((product.quantity ?? 0) < item.quantity) {
@@ -71,6 +71,7 @@ const createOrder = async (payload: IOrder) => {
       }
 
       product.quantity = (product.quantity ?? 0) - item.quantity
+      product.bestSellingProduct = product.bestSellingProduct + 1
 
       const customerId = payload.customerInfo.customerId
 
@@ -91,8 +92,8 @@ const createOrder = async (payload: IOrder) => {
       }
 
       // Save updates
-      await variant.save({ session })
-      await product.save({ session })
+      await Variant.findByIdAndUpdate(variant._id, variant, { session })
+      await Product.findByIdAndUpdate(item.productId, product, { session })
     }
 
     // Step 6: Commit transaction
@@ -123,10 +124,10 @@ const createOrderByAdmin = async (
 
     if (!user) {
       // Step 1: Create User
-      const userId = generateUserId(customerPayload.fullName)
+      // const userId = generateUserId(customerPayload.fullName)
 
       const userData: Partial<IUser> = {
-        userId,
+        //userId,
         email: customerPayload.email,
         contactNumber: customerPayload.contactNumber,
         password,

@@ -1,3 +1,7 @@
+<<<<<<< HEAD:logs/2025-08-11.log
+{"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-11T12:28:10.037Z"}
+{"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-11T12:30:43.482Z"}
+=======
 {"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-10T18:35:01.763Z"}
 {"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-10T19:14:38.919Z"}
 {"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-10T19:15:54.734Z"}
@@ -12,3 +16,4 @@
 {"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-10T21:53:33.538Z"}
 {"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-11T07:01:42.830Z"}
 {"level":"info","message":"🚀 ArvionMart server is running at http://192.168.0.104:5000","timestamp":"2025-08-11T13:49:38.445Z"}
+>>>>>>> 7f42b8d6164287696cd85eef797c7f6b47fd7753:LOG_FILES/2025-08-11.log

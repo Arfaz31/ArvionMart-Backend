@@ -16,6 +16,7 @@ import { PromoBannerRoutes } from '../modules/PromoCard/promoCard.routes'
 import { ReviewRoutes } from '../modules/Review/review.routes'
 import { BrandOfferRoutes } from '../modules/TopBrandsAndOffers/topBrandAndOffers.route'
 import { StoryRoutes } from '../modules/Story/story.route'
+import { DashboardOverviewRoutes } from '../modules/Dashboardoverview/dashboardoverview.routes'
 import { SideBannerRoutes } from '../modules/SideBanner/sidebanner.route'
 import { PointsOfferRoutes } from '../modules/PointsOffer/pointsoffer.route'
 
@@ -89,6 +90,10 @@ const router = [
   {
     path: '/story',
     routes: StoryRoutes,
+  },
+  {
+    path: '/dashboradoverview',
+    routes: DashboardOverviewRoutes,
   },
   {
     path: '/sidebanner',

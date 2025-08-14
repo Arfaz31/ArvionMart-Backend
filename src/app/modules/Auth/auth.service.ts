@@ -10,24 +10,31 @@ import { Customers } from '../Customers/customers.model'
 import config from '../../config'
 import { jwtHelper } from '../../utils/jwtHelper'
 import { UserRole } from '../User/user.contant'
+import mongoose from 'mongoose'
+import { IUser } from '../User/user.interface'
+import { ICustomer } from '../Customers/customers.interface'
 
-//login
+//contact number login
 const loginUser = async (payload: IAuth) => {
-  const { email, password } = payload
-  const user = await User.findOne({ email })
+  const { contactNumber, password } = payload
+  const user = await User.findOne({ contactNumber })
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid email or password')
   }
-  const comparePassword = await bcrypt.compare(password, user.password)
+  if (!password) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Password is required')
+  }
+  const comparePassword = await bcrypt.compare(
+    password,
+    user.password as string
+  )
   if (!comparePassword) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Password does not match')
   }
 
   const jwtPayload = {
     _id: user._id,
-    userId: user.userId,
     contactNumber: user.contactNumber,
-    email: user.email,
     role: user.role,
   }
 
@@ -49,6 +56,82 @@ const loginUser = async (payload: IAuth) => {
   }
 }
 
+//customer google login
+const googleLogin = async (payload: IAuth) => {
+  console.log(payload, 'payload')
+  const isUserExist = await User.findOne({
+    email: payload.email,
+    status: 'ACTIVE',
+    isDeleted: false,
+  })
+
+  if (!isUserExist) {
+    //start mongoose session
+    const session = await mongoose.startSession()
+    try {
+      session.startTransaction()
+
+      const userData: Partial<IUser> = {
+        email: payload.email,
+        role: UserRole.customer,
+      }
+
+      console.log(userData, 'user')
+
+      const user = await User.create([userData], { session })
+
+      console.log(user, 'userData')
+      if (!user.length) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'User creation failed')
+      }
+
+      const customerData: Partial<ICustomer> = {
+        user: user[0]._id,
+        fullName: payload.fullName,
+        email: payload.email,
+        profileImage: payload.profileImage,
+      }
+
+      console.log(customerData, 'cust')
+
+      const customer = await Customers.create([customerData], { session })
+      if (!customer.length) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Customer creation failed')
+      }
+
+      await session.commitTransaction()
+      await session.endSession()
+
+      const jwtPayload = {
+        _id: user[0]._id,
+        email: user[0].email,
+        role: user[0].role,
+      }
+
+      const accessToken = jwtHelper.generateToken(
+        jwtPayload,
+        config.jwt.jwt_access_secret as string,
+        config.jwt.jwt_access_expirein as string
+      )
+
+      const refreshToken = jwtHelper.generateToken(
+        jwtPayload,
+        config.jwt.jwt_refresh_secret as string,
+        config.jwt.jwt_refresh_expirein as string
+      )
+
+      return {
+        accessToken,
+        refreshToken,
+      }
+    } catch (error: any) {
+      await session.abortTransaction()
+      await session.endSession()
+      throw new Error(error)
+    }
+  }
+}
+
 //vendor login
 const vendorLogin = async (payload: IAuth) => {
   const { email, password } = payload
@@ -56,14 +139,19 @@ const vendorLogin = async (payload: IAuth) => {
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid email or password')
   }
-  const comparePassword = await bcrypt.compare(password, user.password)
+  if (!password) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Password is required')
+  }
+  const comparePassword = await bcrypt.compare(
+    password,
+    user.password as string
+  )
   if (!comparePassword) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid email or password')
   }
 
   const jwtPayload = {
     _id: user._id,
-    userId: user.userId,
     email: user.email,
     role: user.role,
     status: user.status,
@@ -111,7 +199,6 @@ const generateAccessToken = async (token: string) => {
 
   const jwtPayload = {
     _id: isUserExist._id,
-    userId: isUserExist.userId,
     email: isUserExist.email,
     role: isUserExist.role,
   }
@@ -150,7 +237,6 @@ const forgetPasswordLink = async (payload: IAuth) => {
 
   const jwtPayload = {
     _id: isUserExist._id,
-    userId: isUserExist.userId,
     email: isUserExist.email,
     role: isUserExist.role,
   }
@@ -163,10 +249,10 @@ const forgetPasswordLink = async (payload: IAuth) => {
 
   const resetPasswordLink = `http://localhost:3000?${isUserExist.email}&token=${resetToken}`
 
-  sendEmail(
-    isUserExist.email,
-    resetHtmlBody(customerName.fullName, resetPasswordLink)
-  )
+  // sendEmail(
+  //   isUserExist.email,
+  //   resetHtmlBody(customerName.fullName, resetPasswordLink)
+  // )
 }
 
 //reset-password
@@ -284,4 +370,5 @@ export const AuthService = {
   resetPassword,
   updatePasswordForStaff,
   vendorLogin,
+  googleLogin,
 }

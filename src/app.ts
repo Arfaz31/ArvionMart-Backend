@@ -20,6 +20,7 @@ app.use(
     origin: [
       'http://localhost:3000',
       'https://arvion-mart-frontend-rho.vercel.app',
+      'https://arvionmart.vercel.app',
     ],
     credentials: true,
   })

@@ -15,7 +15,6 @@ async function main() {
     await mongoose.connect(config.database_url as string)
     console.log('✅ Database connection successful!')
     seedSuperAdmin()
-    //@ts-ignore
     server = app.listen(port, () => {
       console.log(
         `🚀 ArvionMart server is running at http://192.168.0.104:${port}`
