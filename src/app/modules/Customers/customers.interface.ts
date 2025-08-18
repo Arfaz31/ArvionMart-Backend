@@ -1,12 +1,12 @@
 import { Types } from 'mongoose'
 
 export interface ICustomer {
-  fullName: string
+  fullName?: string
   user: Types.ObjectId
   email: string
-  contactNumber: string
+  contactNumber?: string
   profileImage?: string
-  address: string
+  address?: string
   isDeleted: boolean
   totalPoints?: number
 }

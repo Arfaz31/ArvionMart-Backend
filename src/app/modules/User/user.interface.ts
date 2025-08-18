@@ -11,4 +11,6 @@ export interface IUser {
   role: TRole
   status: TStatus
   isDeleted: boolean
+  otp?: string
+  otpExpiresAt?: Date
 }
