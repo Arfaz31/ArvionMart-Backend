@@ -13,52 +13,175 @@ import { UserRole } from '../User/user.contant'
 import mongoose from 'mongoose'
 import { IUser } from '../User/user.interface'
 import { ICustomer } from '../Customers/customers.interface'
+import { optgenerateHtmlSendForUser } from '../../view/otphtml'
+import { Admin } from '../Admin/admin.model'
+
+//generate otp for verification
+const generateOtp = async () => {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString()
+  return otp
+}
 
 //contact number login
 const loginUser = async (payload: IAuth) => {
-  const { contactNumber, password } = payload
-  const user = await User.findOne({ contactNumber })
+  const { email } = payload
+  const user = await User.findOne({ email })
+
   if (!user) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid email or password')
-  }
-  if (!password) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Password is required')
-  }
-  const comparePassword = await bcrypt.compare(
-    password,
-    user.password as string
-  )
-  if (!comparePassword) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Password does not match')
-  }
+    //using transaction and rollbacke create cutomers
+    const session = await mongoose.startSession()
+    try {
+      session.startTransaction()
 
-  const jwtPayload = {
-    _id: user._id,
-    contactNumber: user.contactNumber,
-    role: user.role,
+      const userData: Partial<IUser> = {
+        email: payload.email,
+        role: UserRole.customer,
+      }
+
+      const user = await User.create([userData], { session })
+
+      if (!user.length) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'User creation failed')
+      }
+
+      const customerData: Partial<ICustomer> = {
+        user: user[0]._id,
+        ...(payload.fullName && { fullName: payload.fullName }),
+        email: payload.email,
+        ...(payload.profileImage && { profileImage: payload.profileImage }),
+      }
+
+      const customer = await Customers.create([customerData], { session })
+      if (!customer.length) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Customer creation failed')
+      }
+
+      await session.commitTransaction()
+      await session.endSession()
+
+      const otp = await generateOtp()
+      //save into user collection and set expiration
+      user[0].otp = otp
+      user[0].otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000) // 5 minutes expiration
+      //update user collection not save
+      await User.updateOne(
+        { _id: user[0]._id },
+        { otp: user[0].otp, otpExpiresAt: user[0].otpExpiresAt }
+      )
+
+      const html = optgenerateHtmlSendForUser(otp)
+      await sendEmail(
+        customer[0]?.email,
+        html,
+        'Arvion Mart - OTP Verification',
+        `Your OTP is ${otp}`
+      )
+    } catch (error: any) {
+      await session.abortTransaction()
+      await session.endSession()
+      throw new Error(error)
+    }
+  } else {
+    const otp = await generateOtp()
+    const html = optgenerateHtmlSendForUser(otp)
+    if (!user?.email) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'User email is required for OTP'
+      )
+    }
+    user.otp = otp
+    user.otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000) // 5 minutes expiration
+    //update user collection not save
+    await User.updateOne(
+      { _id: user._id },
+      { otp: user.otp, otpExpiresAt: user.otpExpiresAt }
+    )
+    await sendEmail(
+      user.email,
+      html,
+      'Arvion Mart - OTP Verification',
+      `Your OTP is ${otp}`
+    )
   }
+}
 
-  const accessToken = jwtHelper.generateToken(
-    jwtPayload,
-    config.jwt.jwt_access_secret as string,
-    config.jwt.jwt_access_expirein as string
-  )
+//verify otp
+const verifyOtp = async (payload: { otp: string }) => {
+  const user = await User.findOne({ otp: payload.otp })
+  if (!user) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User not found')
+  }
+  if (user.otp !== payload.otp) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid OTP')
+  }
+  if (user.otpExpiresAt && user.otpExpiresAt < new Date()) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'OTP has expired')
+  }
+  // OTP is valid, proceed with login or other actions. create jwt token
 
-  const refreshToken = jwtHelper.generateToken(
-    jwtPayload,
-    config.jwt.jwt_refresh_secret as string,
-    config.jwt.jwt_refresh_expirein as string
-  )
+  if (user?.role === UserRole.admin || user?.role === UserRole.superAdmin) {
+    const adminData = await Admin.findOne({ user: user._id }).select(
+      '_id,profileImage'
+    )
 
-  return {
-    accessToken,
-    refreshToken,
+    const jwtPayload = {
+      userId: user._id,
+      ...(adminData && { adminId: adminData._id }),
+      email: user.email,
+      ...(adminData && { profileImage: adminData?.profileImage }),
+      role: user.role,
+    }
+
+    const accessToken = jwtHelper.generateToken(
+      jwtPayload,
+      config.jwt.jwt_access_secret as string,
+      config.jwt.jwt_access_expirein as string
+    )
+
+    const refreshToken = jwtHelper.generateToken(
+      jwtPayload,
+      config.jwt.jwt_refresh_secret as string,
+      config.jwt.jwt_refresh_expirein as string
+    )
+
+    return {
+      accessToken,
+      refreshToken,
+    }
+  } else {
+    const customersData = await Customers.findOne({ user: user._id }).select(
+      '_id,profileImage'
+    )
+    const jwtPayload = {
+      userId: user._id,
+      ...(customersData && { customerId: customersData._id }),
+      email: user.email,
+      ...(customersData && { profileImage: customersData?.profileImage }),
+      role: user.role,
+    }
+
+    const accessToken = jwtHelper.generateToken(
+      jwtPayload,
+      config.jwt.jwt_access_secret as string,
+      config.jwt.jwt_access_expirein as string
+    )
+
+    const refreshToken = jwtHelper.generateToken(
+      jwtPayload,
+      config.jwt.jwt_refresh_secret as string,
+      config.jwt.jwt_refresh_expirein as string
+    )
+
+    return {
+      accessToken,
+      refreshToken,
+    }
   }
 }
 
 //customer google login
 const googleLogin = async (payload: IAuth) => {
-  console.log(payload, 'payload')
   const isUserExist = await User.findOne({
     email: payload.email,
     status: 'ACTIVE',
@@ -76,11 +199,8 @@ const googleLogin = async (payload: IAuth) => {
         role: UserRole.customer,
       }
 
-      console.log(userData, 'user')
-
       const user = await User.create([userData], { session })
 
-      console.log(user, 'userData')
       if (!user.length) {
         throw new AppError(httpStatus.BAD_REQUEST, 'User creation failed')
       }
@@ -91,8 +211,6 @@ const googleLogin = async (payload: IAuth) => {
         email: payload.email,
         profileImage: payload.profileImage,
       }
-
-      console.log(customerData, 'cust')
 
       const customer = await Customers.create([customerData], { session })
       if (!customer.length) {
@@ -128,6 +246,29 @@ const googleLogin = async (payload: IAuth) => {
       await session.abortTransaction()
       await session.endSession()
       throw new Error(error)
+    }
+  } else {
+    const jwtPayload = {
+      _id: isUserExist?._id,
+      email: isUserExist?.email,
+      role: isUserExist?.role,
+    }
+
+    const accessToken = jwtHelper.generateToken(
+      jwtPayload,
+      config.jwt.jwt_access_secret as string,
+      config.jwt.jwt_access_expirein as string
+    )
+
+    const refreshToken = jwtHelper.generateToken(
+      jwtPayload,
+      config.jwt.jwt_refresh_secret as string,
+      config.jwt.jwt_refresh_expirein as string
+    )
+
+    return {
+      accessToken,
+      refreshToken,
     }
   }
 }
@@ -371,4 +512,5 @@ export const AuthService = {
   updatePasswordForStaff,
   vendorLogin,
   googleLogin,
+  verifyOtp,
 }

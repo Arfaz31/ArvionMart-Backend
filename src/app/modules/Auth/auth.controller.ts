@@ -5,17 +5,27 @@ import { AuthService } from './auth.service'
 
 const login = catchAsync(async (req, res) => {
   const result = await AuthService.loginUser(req.body)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'OTP sent to your email. Please verify to login.',
+    data: result,
+  })
+})
+
+//verify otp
+const verifyOtp = catchAsync(async (req, res) => {
+  const result = await AuthService.verifyOtp(req.body)
   if (result) {
     const { refreshToken } = result
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: 'none',
     })
   }
   sendResponse(res, {
     statusCode: httpStatus.OK,
-    message: 'Login successfully',
+    message: 'OTP verified successfully',
     data: result,
   })
 })
@@ -105,4 +115,5 @@ export const AuthController = {
   forgetPassword,
   resetPassword,
   updatePassword,
+  verifyOtp,
 }

@@ -38,6 +38,12 @@ const userSchema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
+    otp: {
+      type: String,
+    },
+    otpExpiresAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
