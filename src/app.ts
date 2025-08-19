@@ -3,7 +3,7 @@ import express, { Application } from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
-import rateLimit from 'express-rate-limit'
+// import rateLimit from 'express-rate-limit'
 import middlewareRoutes from './app/routes'
 import globalErrorHandler from './app/middleware/globalErrorHandler'
 import { notFoundRoutes } from './app/middleware/notFoundRoutes'
@@ -28,12 +28,12 @@ app.use(
 app.use(helmet())
 
 // 1. Rate Limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.',
-})
-app.use(limiter)
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+//   message: 'Too many requests from this IP, please try again later.',
+// })
+// app.use(limiter)
 
 // Routes
 app.use('/api/v1', middlewareRoutes)

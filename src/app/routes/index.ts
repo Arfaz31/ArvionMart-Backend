@@ -19,6 +19,7 @@ import { StoryRoutes } from '../modules/Story/story.route'
 import { DashboardOverviewRoutes } from '../modules/Dashboardoverview/dashboardoverview.routes'
 import { SideBannerRoutes } from '../modules/SideBanner/sidebanner.route'
 import { PointsOfferRoutes } from '../modules/PointsOffer/pointsoffer.route'
+import { LogoRoutes } from '../modules/Logo/logo.route'
 
 const middlewareRoutes = Router()
 
@@ -102,6 +103,10 @@ const router = [
   {
     path: '/points-offer',
     routes: PointsOfferRoutes,
+  },
+  {
+    path: '/logo',
+    routes: LogoRoutes,
   },
 ]
 
