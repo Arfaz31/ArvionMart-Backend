@@ -15,6 +15,18 @@ const contactInfoSchema = new Schema<IContactInfo>(
       type: String,
       required: true,
     },
+    facebookLink: {
+      type: String,
+      required: false,
+    },
+    instagramLink: {
+      type: String,
+      required: false,
+    },
+    youtubeLink: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true,
