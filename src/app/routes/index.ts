@@ -20,6 +20,8 @@ import { DashboardOverviewRoutes } from '../modules/Dashboardoverview/dashboardo
 import { SideBannerRoutes } from '../modules/SideBanner/sidebanner.route'
 import { PointsOfferRoutes } from '../modules/PointsOffer/pointsoffer.route'
 import { LogoRoutes } from '../modules/Logo/logo.route'
+import { BlogRoutes } from '../modules/Blogs/blog.route'
+import { ContactInfoRoutes } from '../modules/ContactInfo/contactInfo.route'
 
 const middlewareRoutes = Router()
 
@@ -107,6 +109,14 @@ const router = [
   {
     path: '/logo',
     routes: LogoRoutes,
+  },
+  {
+    path: '/blog',
+    routes: BlogRoutes,
+  },
+  {
+    path: '/contact-info',
+    routes: ContactInfoRoutes,
   },
 ]
 
