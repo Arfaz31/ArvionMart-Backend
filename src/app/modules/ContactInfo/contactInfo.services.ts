@@ -14,7 +14,8 @@ const getContactInfo = async () => {
 
 const updateContactInfo = async (req: Request) => {
   const { id } = req.params
-  const payload = req.body.data
+  const payload = req.body
+
   const result = await ContactInfo.findOneAndUpdate({ _id: id }, payload, {
     new: true,
   })
