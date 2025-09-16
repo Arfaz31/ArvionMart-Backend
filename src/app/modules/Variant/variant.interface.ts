@@ -17,4 +17,8 @@ export interface IVariant {
   productId: Types.ObjectId
   productSKU: string
   unit: string
+  capacity?: string
+  internalStorage?: string
+  operatingSystem?: string
+  ram?: string
 }

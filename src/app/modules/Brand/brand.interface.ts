@@ -1,3 +1,4 @@
+import { Types } from 'mongoose'
 import { TStatus } from '../../interface/common.interface'
 
 export interface IBrand {
@@ -6,5 +7,6 @@ export interface IBrand {
   description: string
   brandLogo?: string
   status: TStatus
+  category:Types.ObjectId
   isDeleted: boolean
 }

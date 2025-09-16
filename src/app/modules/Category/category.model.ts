@@ -39,6 +39,24 @@ const CategorySchema = new Schema<ICategory>(
         type: String,
       },
     ],
+    flagSize: {
+      type: [String],
+    },
+    flagColor: {
+      type: Boolean,
+    },
+    flagCapacity: {
+      type: Boolean,
+    },
+    flagInternalStorage: {
+      type: Boolean,
+    },
+    flagOperatingSystem: {
+      type: Boolean,
+    },
+    flagRam: {
+      type: Boolean,
+    },
   },
   { timestamps: true }
 )

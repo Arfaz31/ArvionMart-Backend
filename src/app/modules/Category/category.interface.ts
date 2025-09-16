@@ -8,4 +8,10 @@ export interface ICategory {
   status: TStatus
   metaTags: string[]
   isDeleted: boolean
+  flagSize?: string[]
+  flagColor?: boolean
+  flagCapacity?: boolean
+  flagInternalStorage?: boolean
+  flagOperatingSystem?: boolean
+  flagRam?: boolean
 }

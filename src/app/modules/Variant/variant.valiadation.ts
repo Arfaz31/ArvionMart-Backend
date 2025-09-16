@@ -13,7 +13,7 @@ const SizeSchema = z.object({
 })
 
 const CreatedVariantSchema = z.object({
-  size: z.array(SizeSchema).optional(), // now correctly typed as array of size objects
+  size: z.array(SizeSchema).optional(),
   color: z.string().optional(),
   features: z.array(z.string()).default([]),
   quantity: z
@@ -22,7 +22,7 @@ const CreatedVariantSchema = z.object({
       invalid_type_error: 'Quantity must be a number',
     })
     .min(0, 'Quantity cannot be negative')
-    .optional(), // optional if size[] is provided
+    .optional(),
   purchasePrice: z
     .number({
       required_error: 'Purchase price is required',
@@ -45,6 +45,10 @@ const CreatedVariantSchema = z.object({
   unit: z.string({
     required_error: 'Unit is required',
   }),
+  capacity: z.string().optional(),
+  internalStorage: z.string().optional(),
+  operatingSystem: z.string().optional(),
+  ram: z.string().optional(),
 })
 
 const updateVariantSchema = z.object({
@@ -59,6 +63,10 @@ const updateVariantSchema = z.object({
     .optional(),
   discount: z.number().min(0, 'Discount cannot be negative').optional(),
   unit: z.string().optional(),
+  capacity: z.string().optional(),
+  internalStorage: z.string().optional(),
+  operatingSystem: z.string().optional(),
+  ram: z.string().optional(),
 })
 
 export const VariantValidation = {
