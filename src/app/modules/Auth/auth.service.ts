@@ -22,7 +22,7 @@ const generateOtp = async () => {
   return otp
 }
 
-//contact number login
+//*contact number login
 const loginUser = async (payload: IAuth) => {
   const { email } = payload
   const user = await User.findOne({ email })
@@ -106,7 +106,7 @@ const loginUser = async (payload: IAuth) => {
   }
 }
 
-//verify otp
+//*verify otp
 const verifyOtp = async (payload: { otp: string }) => {
   const user = await User.findOne({ otp: payload.otp })
   if (!user) {
@@ -180,7 +180,7 @@ const verifyOtp = async (payload: { otp: string }) => {
   }
 }
 
-//customer google login
+//*customer google login
 const googleLogin = async (payload: IAuth) => {
   const isUserExist = await User.findOne({
     email: payload.email,
@@ -273,7 +273,16 @@ const googleLogin = async (payload: IAuth) => {
   }
 }
 
-//vendor login
+//*check token is correct or not or expired or not
+const veryFyTokenForUser = async (token: string) => {
+  const decoded = jwtHelper.verifyToken(
+    token,
+    config.jwt.jwt_access_secret as string
+  )
+  return decoded
+}
+
+//!vendor login-- Do not need our application
 const vendorLogin = async (payload: IAuth) => {
   const { email, password } = payload
   const user = await User.findOne({ email })
@@ -316,7 +325,7 @@ const vendorLogin = async (payload: IAuth) => {
   }
 }
 
-//generate-access-token-from-refresh-token
+//*generate-access-token-from-refresh-token
 const generateAccessToken = async (token: string) => {
   let decoded
   try {
@@ -355,7 +364,7 @@ const generateAccessToken = async (token: string) => {
   }
 }
 
-//forget-password
+//!forget-password-- Do not need our application
 const forgetPasswordLink = async (payload: IAuth) => {
   const isUserExist = await User.findOne({
     email: payload.email,
@@ -396,7 +405,7 @@ const forgetPasswordLink = async (payload: IAuth) => {
   // )
 }
 
-//reset-password
+//!reset-password-- Do not need our application
 const resetPassword = async (
   payload: { email: string; newPassword: string },
   token: string
@@ -443,6 +452,7 @@ const resetPassword = async (
   )
 }
 
+//!dont need our application
 const updatePasswordForStaff = async (payload: any, user: any) => {
   const { id: targetUserId, newPassword } = payload
   const currentUser = user
@@ -513,4 +523,5 @@ export const AuthService = {
   vendorLogin,
   googleLogin,
   verifyOtp,
+  veryFyTokenForUser,
 }
