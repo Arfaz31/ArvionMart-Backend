@@ -11,6 +11,11 @@ const generateToken = (
   } as SignOptions)
 }
 
+const verifyToken = (token: string, secret: Secret) => {
+  return jwt.verify(token, secret)
+}
+
 export const jwtHelper = {
   generateToken,
+  verifyToken,
 }

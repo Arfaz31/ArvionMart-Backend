@@ -3,6 +3,7 @@ import sendResponse from '../../utils/sendResponse'
 import httpStatus from 'http-status'
 import { AuthService } from './auth.service'
 
+//** login
 const login = catchAsync(async (req, res) => {
   const result = await AuthService.loginUser(req.body)
   sendResponse(res, {
@@ -12,7 +13,7 @@ const login = catchAsync(async (req, res) => {
   })
 })
 
-//verify otp
+//**verify otp
 const verifyOtp = catchAsync(async (req, res) => {
   const result = await AuthService.verifyOtp(req.body)
   if (result) {
@@ -30,6 +31,7 @@ const verifyOtp = catchAsync(async (req, res) => {
   })
 })
 
+//**google login
 const googleLogin = catchAsync(async (req, res) => {
   const result = await AuthService.googleLogin(req.body)
   if (result) {
@@ -47,7 +49,18 @@ const googleLogin = catchAsync(async (req, res) => {
   })
 })
 
-//vendor login
+//** check token is correct or not or expired or not */
+const checkToken = catchAsync(async (req, res) => {
+  const { token } = req.body
+  const result = await AuthService.veryFyTokenForUser(token)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Token verified successfully',
+    data: result,
+  })
+})
+
+//!vendor login-- do not need
 const loginVendor = catchAsync(async (req, res) => {
   const result = await AuthService.vendorLogin(req.body)
   if (result) {
@@ -65,7 +78,7 @@ const loginVendor = catchAsync(async (req, res) => {
   })
 })
 
-//generate token
+//**generate token
 const generateToken = catchAsync(async (req, res) => {
   const { refreshToken } = req.cookies
 
@@ -77,7 +90,7 @@ const generateToken = catchAsync(async (req, res) => {
   })
 })
 
-//forget-password
+//!forget-password-- Do not need our application
 const forgetPassword = catchAsync(async (req, res) => {
   const result = await AuthService.forgetPasswordLink(req.body)
   sendResponse(res, {
@@ -87,7 +100,7 @@ const forgetPassword = catchAsync(async (req, res) => {
   })
 })
 
-//reset-password
+//!reset-password-- Do not need our application
 const resetPassword = catchAsync(async (req, res) => {
   const token = req.headers.authorization
   const result = await AuthService.resetPassword(req.body, token as string)
@@ -98,6 +111,7 @@ const resetPassword = catchAsync(async (req, res) => {
   })
 })
 
+//!update-password-- Do not need our application
 const updatePassword = catchAsync(async (req, res) => {
   const result = await AuthService.updatePasswordForStaff(req.body, req.user)
   sendResponse(res, {
@@ -116,4 +130,5 @@ export const AuthController = {
   resetPassword,
   updatePassword,
   verifyOtp,
+  checkToken,
 }
