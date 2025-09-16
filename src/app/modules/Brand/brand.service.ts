@@ -13,7 +13,7 @@ const createBrand = async (req: Request) => {
 
 const getAllBrand = async (query: Record<string, unknown>) => {
   const brandQuery = await new QueryBuilder(
-    Brand.find({ isDeleted: false }),
+    Brand.find({ isDeleted: false }).populate('category'),
     query
   )
     .search(searchableFields)
@@ -29,7 +29,7 @@ const getAllBrand = async (query: Record<string, unknown>) => {
 }
 
 const getActiveBrand = async () => {
-  const result = await Brand.find({ status: 'ACTIVE' })
+  const result = await Brand.find({ status: 'ACTIVE' }).populate('category')
   return result
 }
 

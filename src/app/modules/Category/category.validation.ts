@@ -20,6 +20,12 @@ const CategoryValidationSchema = z.object({
       'Slug must contain only lowercase letters, numbers, and hyphens'
     ),
   metaTags: z.array(z.string()),
+  flagSize: z.array(z.string()).optional(),
+  flagColor: z.boolean().optional(),
+  flagCapacity: z.boolean().optional(),
+  flagInternalStorage: z.boolean().optional(),
+  flagOperatingSystem: z.boolean().optional(),
+  flagRam: z.boolean().optional(),
 })
 
 const UpdateCategoryValidationSchema = z.object({
@@ -27,6 +33,12 @@ const UpdateCategoryValidationSchema = z.object({
   description: z.string().optional(),
   slug: z.string().optional(),
   metaTags: z.array(z.string()).optional(),
+  flagSize: z.array(z.string()).optional(),
+  flagColor: z.boolean().optional(),
+  flagCapacity: z.boolean().optional(),
+  flagInternalStorage: z.boolean().optional(),
+  flagOperatingSystem: z.boolean().optional(),
+  flagRam: z.boolean().optional(),
 })
 
 export const CategoryValidation = {

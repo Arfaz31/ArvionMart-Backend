@@ -29,6 +29,11 @@ const BrandSchema = new Schema<IBrand>(
       enum: ['ACTIVE', 'INACTIVE'],
       default: 'ACTIVE',
     },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

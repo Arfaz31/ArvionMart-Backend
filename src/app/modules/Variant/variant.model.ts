@@ -57,6 +57,18 @@ const VariantSchema = new Schema<IVariant>(
       type: String,
       required: true,
     },
+    capacity: {
+      type: String,
+    },
+    internalStorage: {
+      type: String,
+    },
+    operatingSystem: {
+      type: String,
+    },
+    ram: {
+      type: String,
+    },
   },
   { timestamps: true }
 )

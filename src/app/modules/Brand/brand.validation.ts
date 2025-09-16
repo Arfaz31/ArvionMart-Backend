@@ -15,12 +15,14 @@ const BrandValidationSchema = z.object({
     ),
 
   description: z.string(),
+  category: z.string(),
 })
 
 const UpdateBrnadValidationSchema = z.object({
   brandName: z.string().optional(),
   slug: z.string().optional(),
   description: z.string().optional(),
+  category: z.string().optional(),
 })
 
 export const BrandValidation = {
