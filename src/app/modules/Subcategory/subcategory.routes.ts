@@ -24,6 +24,12 @@ router.post(
   SubcategoryController.createSubCategoryIntoDB
 )
 
+router.get(
+  '/:id',
+  // auth(...Object.values(UserRole)),
+  SubcategoryController.getSubCategoryById
+)
+
 router.patch(
   '/update/:id',
   // auth(UserRole.admin, UserRole.superAdmin),

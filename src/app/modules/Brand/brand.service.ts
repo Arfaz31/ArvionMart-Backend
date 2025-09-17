@@ -33,6 +33,16 @@ const getActiveBrand = async () => {
   return result
 }
 
+const getBrandById = async (id: string) => {
+  const result = await Brand.findById(id).populate('category')
+  return result
+}
+
+const getBrandByCategoryId = async (categoryId: string) => {
+  const result = await Brand.find({ category: categoryId }).populate('category')
+  return result
+}
+
 const updateBrand = async (req: Request) => {
   const { id: _id } = req.params
   const payload = req.body
@@ -82,6 +92,8 @@ export const BrandService = {
   createBrand,
   getAllBrand,
   getActiveBrand,
+  getBrandById,
+  getBrandByCategoryId,
   updateBrand,
   deleteBrand,
 }

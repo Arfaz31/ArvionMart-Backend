@@ -21,6 +21,12 @@ router.post(
   CategoryController.createCategoryIntoDB
 )
 
+router.get(
+  '/:id',
+  // auth(...Object.values(UserRole)),
+  CategoryController.getCategoryById
+)
+
 router.patch(
   '/:id',
   auth(UserRole.admin, UserRole.superAdmin),

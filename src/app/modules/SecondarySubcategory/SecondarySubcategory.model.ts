@@ -3,6 +3,13 @@ import { ISecondarySubcategory } from './SecondarySubcategory.interface'
 
 const SecondarySubcategorySchema = new Schema<ISecondarySubcategory>(
   {
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
     secondarySubcategoryName: {
       type: String,
       required: true,

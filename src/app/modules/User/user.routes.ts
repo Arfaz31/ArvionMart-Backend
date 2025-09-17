@@ -42,7 +42,7 @@ router.post('/create-vendor', UserController.vendorRegister)
 
 router.get(
   '/me',
-  auth(UserRole.admin, UserRole.customer, UserRole.vendor),
+  auth(UserRole.admin, UserRole.customer, UserRole.superAdmin),
   UserController.getMeFromDB
 )
 

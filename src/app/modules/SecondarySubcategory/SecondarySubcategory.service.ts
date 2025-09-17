@@ -52,25 +52,24 @@ const getAllSecondarySubcategory = async (query: Record<string, unknown>) => {
 }
 
 //get category, sub category, and secondary sub category
-const getSecondarySubcategoryBySubcategory = async (id: string) => {
-  // Find all subcategories under the given category
+const getSecondarySubcategoryByCategoryId = async (id: string) => {
+  // Find all subcategories for the given category ID
   const subcategories = await Subcategory.find({ category: id })
 
-  // Map over each subcategory to find its secondary subcategories
-  const combinedResult = await Promise.all(
-    subcategories.map(async subcategory => {
-      const secondarySubcategories = await SecondarySubcategory.find({
-        subcategory: subcategory._id,
-      })
+  // Get the IDs of those subcategories
+  const subcategoryIds = subcategories.map(sub => sub._id)
 
-      return {
-        subcategory,
-        secondarySubcategories,
-      }
-    })
-  )
+  // Find all secondary subcategories that belong to those subcategories
+  const result = await SecondarySubcategory.find({
+    subcategory: { $in: subcategoryIds },
+  })
 
-  return combinedResult
+  return result
+}
+
+const getSecondarySubCategoryById = async (id: string) => {
+  const result = await SecondarySubcategory.findById(id)
+  return result
 }
 
 //get secondary subcategory by subcategory
@@ -106,8 +105,9 @@ const deleteSecondarySubcategory = async (id: string) => {
 export const SecondarySubcategoryService = {
   createSecondarySubcategory,
   getAllSecondarySubcategory,
+  getSecondarySubCategoryById,
   updateSecondarySubcategory,
   deleteSecondarySubcategory,
-  getSecondarySubcategoryBySubcategory,
   getSecondarySubcategoryBySubcategoryFormDB,
+  getSecondarySubcategoryByCategoryId,
 }
