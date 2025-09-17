@@ -242,8 +242,10 @@ const getAllCustomersFromDB = async (query: Record<string, unknown>) => {
 }
 
 //Get me
-const getMe = async (user: string) => {
-  const isUserExist = await User.findOne({ _id: user })
+const getMe = async (req: Request) => {
+  const userID = req.user.userId
+
+  const isUserExist = await User.findOne({ _id: userID })
   if (!isUserExist) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User not found')
   }
@@ -258,6 +260,12 @@ const getMe = async (user: string) => {
       user: isUserExist._id,
     }).populate('user')
     return getProfile
+  } else if (isUserExist.role === UserRole.superAdmin) {
+    const superAdminProfile = await User.findOne(
+      { _id: userID },
+      { email: 1, contactNumber: 1, role: 1, _id: 0 }
+    )
+    return superAdminProfile
   }
 }
 
@@ -306,19 +314,19 @@ const deleteUser = async (id: string) => {
 }
 
 const updateMyProfile = async (req: Request) => {
-  const { _id } = req.user
+  const { userId } = req.user
   const payload = req.body
 
   if (req.file) {
     payload.profileImage = req.file.path
   }
 
-  const user = await User.findById(_id)
+  const user = await User.findById(userId)
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
 
-  const customer = await Customers.findOne({ user: _id })
+  const customer = await Customers.findOne({ user: userId })
   if (!customer) {
     throw new AppError(httpStatus.NOT_FOUND, 'Customer not found')
   }
@@ -334,7 +342,7 @@ const updateMyProfile = async (req: Request) => {
   )
 
   const updatedCustomer = await Customers.findOneAndUpdate(
-    { user: _id },
+    { user: userId },
     filteredPayload,
     {
       new: true,

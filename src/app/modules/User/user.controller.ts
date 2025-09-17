@@ -66,9 +66,7 @@ const getAllCustomers = catchAsync(async (req, res) => {
 })
 
 const getMeFromDB = catchAsync(async (req, res) => {
-  const { _id } = req.user
-
-  const result = await UserService.getMe(_id)
+  const result = await UserService.getMe(req)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Profile get successfully',

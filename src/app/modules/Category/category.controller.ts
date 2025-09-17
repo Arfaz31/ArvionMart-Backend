@@ -22,6 +22,15 @@ const getAllCategory = catchAsync(async (req, res) => {
   })
 })
 
+const getCategoryById = catchAsync(async (req, res) => {
+  const result = await CategoryService.getCategoryById(req.params.id)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Category get successfully',
+    data: result,
+  })
+})
+
 const updateCategoryIntoDB = catchAsync(async (req, res) => {
   const result = await CategoryService.updateCategory(req)
   sendResponse(res, {
@@ -44,6 +53,7 @@ const deleteCategory = catchAsync(async (req, res) => {
 export const CategoryController = {
   createCategoryIntoDB,
   getAllCategory,
+  getCategoryById,
   updateCategoryIntoDB,
   deleteCategory,
 }

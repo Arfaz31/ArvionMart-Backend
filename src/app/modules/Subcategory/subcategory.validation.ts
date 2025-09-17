@@ -3,7 +3,7 @@ import { z } from 'zod'
 const SubCategoryValidationSchema = z.object({
   subcategoryName: z
     .string()
-    .min(2, 'Category name must be at least 2 characters')
+    .min(3, 'Category name must be at least 3 characters')
     .max(100, 'Category name cannot exceed 100 characters'),
 
   category: z.string().min(2, 'Category name must be at least 2 characters'),
@@ -15,7 +15,7 @@ const SubCategoryValidationSchema = z.object({
 
   slug: z
     .string()
-    .min(2, 'Slug must be at least 2 characters')
+    .min(3, 'Slug must be at least 3 characters')
     .max(100, 'Slug cannot exceed 100 characters')
     .regex(
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,

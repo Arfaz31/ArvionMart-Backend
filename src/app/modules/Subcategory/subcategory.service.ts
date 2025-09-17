@@ -47,6 +47,11 @@ const getAllsubcategory = async (query: Record<string, unknown>) => {
   }
 }
 
+const getSubCategoryById = async (id: string) => {
+  const result = await Subcategory.findById(id).populate('category')
+  return result
+}
+
 const getSubCategoryByCategory = async (categoryId: string) => {
   const _id = categoryId
   const result = await Subcategory.find({ category: _id }).populate('category')
@@ -101,6 +106,7 @@ const deletesubcategory = async (id: string) => {
 export const SubcategoryService = {
   createSubcategory,
   getAllsubcategory,
+  getSubCategoryById,
   getSubCategoryByCategory,
   updatesubcategory,
   deletesubcategory,

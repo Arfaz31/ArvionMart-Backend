@@ -22,6 +22,11 @@ router.get(
   SecondarySubcategoryController.getSecondarySubcategoryBySubcategory
 )
 
+router.get(
+  '/category/:id',
+  SecondarySubcategoryController.getSecondarySubcategoryByCategoryId
+)
+
 router.post(
   '/create',
   // auth(UserRole.admin, UserRole.superAdmin),

@@ -22,6 +22,15 @@ const getAllSubcategory = catchAsync(async (req, res) => {
   })
 })
 
+const getSubCategoryById = catchAsync(async (req, res) => {
+  const result = await SubcategoryService.getSubCategoryById(req.params.id)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Subcategory get successfully',
+    data: result,
+  })
+})
+
 const getSubCategoryByCategoryFormDB = catchAsync(async (req, res) => {
   const result = await SubcategoryService.getSubCategoryByCategory(
     req.params.id
@@ -55,6 +64,7 @@ const deleteSubcategory = catchAsync(async (req, res) => {
 export const SubcategoryController = {
   createSubCategoryIntoDB,
   getAllSubcategory,
+  getSubCategoryById,
   updateSubcategoryIntoDB,
   getSubCategoryByCategoryFormDB,
   deleteSubcategory,

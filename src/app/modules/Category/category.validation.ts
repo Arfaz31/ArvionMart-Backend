@@ -13,7 +13,7 @@ const CategoryValidationSchema = z.object({
 
   slug: z
     .string()
-    .min(2, 'Slug must be at least 2 characters')
+    .min(3, 'Slug must be at least 3 characters')
     .max(100, 'Slug cannot exceed 100 characters')
     .regex(
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,

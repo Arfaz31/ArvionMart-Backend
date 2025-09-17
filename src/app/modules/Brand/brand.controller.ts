@@ -31,6 +31,24 @@ const getActiveBrand = catchAsync(async (req, res) => {
   })
 })
 
+const getBrandById = catchAsync(async (req, res) => {
+  const result = await BrandService.getBrandById(req.params.id)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Brand get successfully',
+    data: result,
+  })
+})
+
+const getBrandByCategoryId = catchAsync(async (req, res) => {
+  const result = await BrandService.getBrandByCategoryId(req.params.id)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Brand get successfully',
+    data: result,
+  })
+})
+
 const updateBrandIntoDB = catchAsync(async (req, res) => {
   const result = await BrandService.updateBrand(req)
   sendResponse(res, {
@@ -53,6 +71,8 @@ const deleteBrand = catchAsync(async (req, res) => {
 export const BrandController = {
   createBrandIntoDB,
   getAllBrand,
+  getBrandById,
+  getBrandByCategoryId,
   getActiveBrand,
   updateBrandIntoDB,
   deleteBrand,

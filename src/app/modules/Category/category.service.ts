@@ -53,6 +53,11 @@ const getAllCategory = async (query: Record<string, unknown>) => {
   }
 }
 
+const getCategoryById = async (id: string) => {
+  const result = await Category.findById(id)
+  return result
+}
+
 const updateCategory = async (req: Request) => {
   const { id: _id } = req.params
   const payload = req.body
@@ -90,6 +95,7 @@ const deleteCategory = async (id: string) => {
 export const CategoryService = {
   createCategory,
   getAllCategory,
+  getCategoryById,
   updateCategory,
   deleteCategory,
 }

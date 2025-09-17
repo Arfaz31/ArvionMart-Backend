@@ -36,7 +36,7 @@ const auth = (...roles: (keyof typeof UserRole)[]) => {
     if (roles.length && !roles.includes(role)) {
       throw new AppError(httpStatus.FORBIDDEN, 'Forbidden')
     }
-    req.user = isUserExist as JwtPayload
+    req.user = decoded as JwtPayload
     next()
   })
 }

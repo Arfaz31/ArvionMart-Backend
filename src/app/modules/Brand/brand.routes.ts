@@ -27,6 +27,18 @@ router.post(
   BrandController.createBrandIntoDB
 )
 
+router.get(
+  '/:id',
+  // auth(...Object.values(UserRole)),
+  BrandController.getBrandById
+)
+
+router.get(
+  '/:id',
+  // auth(...Object.values(UserRole)),
+  BrandController.getBrandByCategoryId
+)
+
 router.patch(
   '/:id',
   // auth(UserRole.admin, UserRole.superAdmin, UserRole.vendor),
