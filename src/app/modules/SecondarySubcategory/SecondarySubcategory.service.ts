@@ -102,6 +102,16 @@ const deleteSecondarySubcategory = async (id: string) => {
   return result
 }
 
+const getSecondarySubcategoryBySlug = async (slug: string) => {
+  const result = await SecondarySubcategory.findOne({ slug }).populate({
+    path: 'subcategory',
+    populate: {
+      path: 'category',
+    },
+  })
+  return result
+}
+
 export const SecondarySubcategoryService = {
   createSecondarySubcategory,
   getAllSecondarySubcategory,
@@ -110,4 +120,5 @@ export const SecondarySubcategoryService = {
   deleteSecondarySubcategory,
   getSecondarySubcategoryBySubcategoryFormDB,
   getSecondarySubcategoryByCategoryId,
+  getSecondarySubcategoryBySlug,
 }

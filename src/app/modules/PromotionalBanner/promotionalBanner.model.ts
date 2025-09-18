@@ -8,6 +8,18 @@ const PromotionalBannerSchema = new Schema<IPromotionalBanner>(
       required: true,
       trim: true,
     },
+    brandSlug: {
+      type: String,
+    },
+    categorySlug: {
+      type: String,
+    },
+    subcategorySlug: {
+      type: String,
+    },
+    secondarySubcategorySlug: {
+      type: String,
+    },
     categoryId: {
       type: Schema.Types.ObjectId,
       ref: 'Category',

@@ -231,6 +231,15 @@ const getAllProducts = async (query: Record<string, unknown>) => {
   }
 }
 
+const getProductBySlug = async (slug: string) => {
+  const result = await Product.findOne({ slug })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('variant')
+  return result
+}
+
 const getIsFeaturedProduct = async () => {
   const result = await Product.find({
     isFeatured: true,
@@ -625,4 +634,5 @@ export const ProductService = {
   getLastProduct,
   getTotalProductCount,
   getCategoryRelatedProductsFromDB,
+  getProductBySlug,
 }

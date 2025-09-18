@@ -2,6 +2,14 @@ import { z } from 'zod'
 
 const productSchemaValidation = z.object({
   productName: z.string().min(1, 'Product name is required').trim(),
+  // slug: z
+  //   .string()
+  //   .min(3, 'Slug must be at least 3 characters')
+  //   .max(100, 'Slug cannot exceed 100 characters')
+  //   .regex(
+  //     /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+  //     'Slug must contain only lowercase letters, numbers, and hyphens'
+  //   ),
   description: z
     .string()
     .min(10, 'Description should be at least 10 characters')
@@ -33,6 +41,7 @@ export const updateProductSchemaValidation = z.object({
     .max(100, 'Product name cannot exceed 100 characters')
     .trim()
     .optional(),
+  // slug: z.string().optional(),
 
   description: z
     .string()

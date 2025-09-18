@@ -2,6 +2,9 @@ import { z } from 'zod'
 
 const bannerSchemaValidation = z.object({
   order: z.number().min(1),
+  categorySlug: z.string().optional(),
+  subcategorySlug: z.string().optional(),
+  secondarySubcategorySlug: z.string().optional(),
   categoryId: z.string().optional(),
   subcategoryId: z.string().optional(),
   secondarySubcategoryId: z.string().optional(),
@@ -11,6 +14,9 @@ const bannerSchemaValidation = z.object({
 
 const updateBannerSchemaValidation = z.object({
   order: z.number().min(1).optional(),
+  categorySlug: z.string().optional(),
+  subcategorySlug: z.string().optional(),
+  secondarySubcategorySlug: z.string().optional(),
   categoryId: z.string().optional(),
   subcategoryId: z.string().optional(),
   secondarySubcategoryId: z.string().optional(),

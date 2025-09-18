@@ -8,6 +8,15 @@ const PromoCardSchema = new Schema<IPromoCard>(
       required: true,
       trim: true,
     },
+    categorySlug: {
+      type: String,
+    },
+    subcategorySlug: {
+      type: String,
+    },
+    secondarySubcategorySlug: {
+      type: String,
+    },
     categoryId: {
       type: Schema.Types.ObjectId,
       ref: 'Category',

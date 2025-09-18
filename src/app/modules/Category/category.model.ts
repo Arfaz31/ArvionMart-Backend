@@ -19,7 +19,6 @@ const CategorySchema = new Schema<ICategory>(
       unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
     imageUrl: {
       type: String,

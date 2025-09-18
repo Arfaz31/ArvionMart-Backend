@@ -3,6 +3,10 @@ import { Types } from 'mongoose'
 export interface ISideBanner {
   order: number
   image: string
+  brandSlug?: string
+  categorySlug?: string
+  subcategorySlug?: string
+  secondarySubcategorySlug?: string
   categoryId?: Types.ObjectId
   subcategoryId?: Types.ObjectId
   secondarySubcategoryId?: Types.ObjectId

@@ -21,7 +21,12 @@ const getAllPromotionalBanner = async (query: Record<string, unknown>) => {
     sort: '-status -createdAt',
   }
   const bannerQuery = await new QueryBuilder(
-    PromotionalBanner.find(),
+    PromotionalBanner.find()
+      .populate('brandId')
+      .populate('categoryId')
+      .populate('subcategoryId')
+      .populate('secondarySubcategoryId')
+      .populate('productId'),
     updatedQuery
   )
     .search([])

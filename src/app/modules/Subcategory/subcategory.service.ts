@@ -103,6 +103,11 @@ const deletesubcategory = async (id: string) => {
   return result
 }
 
+const getSubcategoryBySlug = async (slug: string) => {
+  const result = await Subcategory.findOne({ slug }).populate('category')
+  return result
+}
+
 export const SubcategoryService = {
   createSubcategory,
   getAllsubcategory,
@@ -110,4 +115,5 @@ export const SubcategoryService = {
   getSubCategoryByCategory,
   updatesubcategory,
   deletesubcategory,
+  getSubcategoryBySlug,
 }

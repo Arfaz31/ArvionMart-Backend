@@ -18,6 +18,11 @@ router.get(
 )
 
 router.get(
+  '/slug/:slug',
+  SecondarySubcategoryController.getSecondarySubcategoryBySlug
+)
+
+router.get(
   '/subcategory/:id',
   SecondarySubcategoryController.getSecondarySubcategoryBySubcategory
 )

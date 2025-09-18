@@ -23,7 +23,6 @@ const subcategorySchema = new Schema<ISubcategory>(
       unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
     imageUrl: {
       type: String,

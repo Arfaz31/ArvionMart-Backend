@@ -8,6 +8,13 @@ const ProductSchema = new Schema<IProduct>(
       required: [true, 'Product name is required'],
       trim: true,
     },
+    // slug: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    //   lowercase: true,
+    //   trim: true,
+    // },
     sku: {
       type: String,
       required: [true, 'Product name is required'],
