@@ -61,6 +61,16 @@ const deleteSubcategory = catchAsync(async (req, res) => {
   })
 })
 
+const getSubcategoryBySlug = catchAsync(async (req, res) => {
+  const { slug } = req.params
+  const result = await SubcategoryService.getSubcategoryBySlug(slug)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Subcategory get successfully',
+    data: result,
+  })
+})
+
 export const SubcategoryController = {
   createSubCategoryIntoDB,
   getAllSubcategory,
@@ -68,4 +78,5 @@ export const SubcategoryController = {
   updateSubcategoryIntoDB,
   getSubCategoryByCategoryFormDB,
   deleteSubcategory,
+  getSubcategoryBySlug,
 }

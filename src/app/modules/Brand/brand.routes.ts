@@ -34,7 +34,13 @@ router.get(
 )
 
 router.get(
-  '/:id',
+  '/slug/:slug',
+  // auth(...Object.values(UserRole)),
+  BrandController.getBrandBySlug
+)
+
+router.get(
+  '/category/:id',
   // auth(...Object.values(UserRole)),
   BrandController.getBrandByCategoryId
 )

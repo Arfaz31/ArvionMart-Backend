@@ -13,6 +13,15 @@ const BannerSchema = new Schema<IBanner>(
       type: String,
       required: [true, 'Image URL is required'],
     },
+    categorySlug: {
+      type: String,
+    },
+    subcategorySlug: {
+      type: String,
+    },
+    secondarySubcategorySlug: {
+      type: String,
+    },
     categoryId: {
       type: Schema.Types.ObjectId,
       ref: 'Category',

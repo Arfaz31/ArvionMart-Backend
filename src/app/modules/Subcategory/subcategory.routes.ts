@@ -30,6 +30,12 @@ router.get(
   SubcategoryController.getSubCategoryById
 )
 
+router.get(
+  '/slug/:slug',
+  // auth(...Object.values(UserRole)),
+  SubcategoryController.getSubcategoryBySlug
+)
+
 router.patch(
   '/update/:id',
   // auth(UserRole.admin, UserRole.superAdmin),

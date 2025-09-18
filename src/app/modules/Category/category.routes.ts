@@ -27,6 +27,12 @@ router.get(
   CategoryController.getCategoryById
 )
 
+router.get(
+  '/get-category-by-slug/:slug',
+  // auth(...Object.values(UserRole)),
+  CategoryController.getCategoryBySlug
+)
+
 router.patch(
   '/:id',
   auth(UserRole.admin, UserRole.superAdmin),

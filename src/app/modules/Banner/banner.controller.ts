@@ -27,6 +27,9 @@ const updateBannerIntoDB = catchAsync(async (req, res) => {
   const payload = req.body
   const file = req.file
 
+  console.log(id)
+  console.log(payload)
+
   const result = await BannerService.updateBanner(id, payload, file)
   sendResponse(res, {
     statusCode: httpStatus.OK,

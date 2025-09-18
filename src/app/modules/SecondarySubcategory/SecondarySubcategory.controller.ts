@@ -84,6 +84,17 @@ const getSecondarySubcategoryByCategoryId = catchAsync(async (req, res) => {
   })
 })
 
+const getSecondarySubcategoryBySlug = catchAsync(async (req, res) => {
+  const { slug } = req.params
+  const result =
+    await SecondarySubcategoryService.getSecondarySubcategoryBySlug(slug)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Secondary Subcategory get successfully',
+    data: result,
+  })
+})
+
 export const SecondarySubcategoryController = {
   createSecondarySubcategory,
   getAllSecondarySubcategory,
@@ -92,4 +103,5 @@ export const SecondarySubcategoryController = {
   getSecondarySubcategoryBySubcategory,
   getSecondarySubcategoryByIdFromDB,
   getSecondarySubcategoryByCategoryId,
+  getSecondarySubcategoryBySlug,
 }

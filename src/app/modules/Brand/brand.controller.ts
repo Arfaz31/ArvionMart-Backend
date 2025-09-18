@@ -68,6 +68,16 @@ const deleteBrand = catchAsync(async (req, res) => {
   })
 })
 
+const getBrandBySlug = catchAsync(async (req, res) => {
+  const { slug } = req.params
+  const result = await BrandService.getBrandBySlug(slug)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Brand get successfully',
+    data: result,
+  })
+})
+
 export const BrandController = {
   createBrandIntoDB,
   getAllBrand,
@@ -76,4 +86,5 @@ export const BrandController = {
   getActiveBrand,
   updateBrandIntoDB,
   deleteBrand,
+  getBrandBySlug,
 }

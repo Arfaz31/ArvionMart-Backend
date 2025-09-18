@@ -58,6 +58,11 @@ const getCategoryById = async (id: string) => {
   return result
 }
 
+const getCategoryBySlug = async (slug: string) => {
+  const result = await Category.findOne({ slug })
+  return result
+}
+
 const updateCategory = async (req: Request) => {
   const { id: _id } = req.params
   const payload = req.body
@@ -98,4 +103,5 @@ export const CategoryService = {
   getCategoryById,
   updateCategory,
   deleteCategory,
+  getCategoryBySlug,
 }

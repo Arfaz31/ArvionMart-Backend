@@ -88,6 +88,11 @@ const deleteBrand = async (id: string) => {
   return result
 }
 
+const getBrandBySlug = async (slug: string) => {
+  const result = await Brand.findOne({ slug }).populate('category')
+  return result
+}
+
 export const BrandService = {
   createBrand,
   getAllBrand,
@@ -96,4 +101,5 @@ export const BrandService = {
   getBrandByCategoryId,
   updateBrand,
   deleteBrand,
+  getBrandBySlug,
 }

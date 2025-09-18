@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
 export const PromotionalBannerSchema = z.object({
+  brandSlug: z.string().optional(),
+  categorySlug: z.string().optional(),
+  subcategorySlug: z.string().optional(),
+  secondarySubcategorySlug: z.string().optional(),
   categoryId: z.string().optional(),
   subcategoryId: z.string().optional(),
   secondarySubcategoryId: z.string().optional(),

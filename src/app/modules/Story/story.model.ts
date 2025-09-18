@@ -16,6 +16,18 @@ const StorySchema = new Schema<IStory>(
       type: String,
       required: [true, 'Image URL is required'],
     },
+    brandSlug: {
+      type: String,
+    },
+    categorySlug: {
+      type: String,
+    },
+    subcategorySlug: {
+      type: String,
+    },
+    secondarySubcategorySlug: {
+      type: String,
+    },
     categoryId: {
       type: Schema.Types.ObjectId,
       ref: 'Category',

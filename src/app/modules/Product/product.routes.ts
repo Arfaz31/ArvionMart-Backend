@@ -54,6 +54,12 @@ router.get(
 )
 
 router.get(
+  '/slug/:slug',
+  // auth(...Object.values(UserRole)),
+  ProductController.getProductBySlug
+)
+
+router.get(
   '/category/:categoryId',
   // auth(...Object.values(UserRole)),
   ProductController.getProductsByCategory
