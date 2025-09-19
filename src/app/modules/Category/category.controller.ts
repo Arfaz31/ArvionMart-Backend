@@ -60,6 +60,19 @@ const getCategoryBySlug = catchAsync(async (req, res) => {
   })
 })
 
+const getSidebarDataforFilterOperation = catchAsync(async (req, res) => {
+  const result = await CategoryService.getSidebarDataforFilterOperation(
+    req.query
+  )
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Sidebar filter data fetched successfully',
+    data: result,
+  })
+})
+
 export const CategoryController = {
   createCategoryIntoDB,
   getAllCategory,
@@ -67,4 +80,5 @@ export const CategoryController = {
   updateCategoryIntoDB,
   deleteCategory,
   getCategoryBySlug,
+  getSidebarDataforFilterOperation,
 }

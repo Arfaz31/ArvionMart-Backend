@@ -18,6 +18,8 @@ router.post(
 
 router.get('/all-blog', BlogController.getAllBlogFromDB)
 
+router.get('/:id', BlogController.getSingleBlogFromDB)
+
 router.patch(
   '/update-blog/:id',
   updloadSingleImage('blog-image'),

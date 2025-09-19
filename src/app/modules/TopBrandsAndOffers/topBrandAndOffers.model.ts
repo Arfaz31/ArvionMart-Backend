@@ -12,6 +12,9 @@ const BrandOfferSchema = new Schema<IBrandOffer>(
       type: String,
       required: true,
     },
+    brandSlug: {
+      type: String,
+    },
     brandId: {
       type: Types.ObjectId,
       ref: 'Brand',

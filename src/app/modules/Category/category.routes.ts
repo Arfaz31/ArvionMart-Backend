@@ -12,6 +12,7 @@ import { UserRole } from '../User/user.contant'
 const router = Router()
 
 router.get('/all-category', CategoryController.getAllCategory)
+router.get('/sidebar-data', CategoryController.getSidebarDataforFilterOperation)
 
 router.post(
   '/create-category',

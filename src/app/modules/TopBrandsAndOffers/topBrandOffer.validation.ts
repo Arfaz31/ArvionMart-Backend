@@ -4,6 +4,7 @@ const createBrandOfferValidationSchema = z.object({
   name: z.string({
     required_error: 'Name is required',
   }),
+  brandSlug: z.string().optional(),
   brandId: z.string().optional(),
   productId: z.string().optional(),
   isTopBrand: z.boolean().optional(),
@@ -13,6 +14,7 @@ const createBrandOfferValidationSchema = z.object({
 
 const updateBrandOfferValidationSchema = z.object({
   name: z.string().optional(),
+  brandSlug: z.string().optional(),
   brandId: z.string().optional(),
   productId: z.string().optional(),
   isTopBrand: z.boolean().optional(),
