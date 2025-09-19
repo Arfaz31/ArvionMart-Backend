@@ -3,6 +3,7 @@ import { Types } from 'mongoose'
 export interface IBrandOffer {
   name: string
   image: string
+  brandSlug?: string
   brandId?: Types.ObjectId
   productId?: Types.ObjectId
   isDeleted: boolean

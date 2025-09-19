@@ -24,7 +24,7 @@ router.get('/top-brands', BrandOfferController.getTopBrandOffers)
 
 router.patch(
   '/:id',
-  auth(UserRole.admin, UserRole.superAdmin),
+  // auth(UserRole.admin, UserRole.superAdmin),
   updloadSingleImage('brandoffer-image'),
   validateRequestedFileData(
     BrandOfferValidation.updateBrandOfferValidationSchema

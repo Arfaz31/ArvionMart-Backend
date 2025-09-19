@@ -79,8 +79,155 @@ const createProductIntoDB = async (req: Request) => {
 }
 
 //get all product
+// const getAllProducts = async (query: Record<string, unknown>) => {
+//   console.log('query', query)
+//   const searchAbleFields = ['productName', 'description', 'barCodeNumber']
+//   const filters: Record<string, any> = { isActive: true }
+
+//   //1️⃣ Handle Variant-Based Filtering (color, size, minPrice, maxPrice)
+//   const variantQuery: Record<string, any> = {}
+
+//   if (query.color) {
+//     variantQuery.color = { $regex: String(query.color), $options: 'i' }
+//   }
+
+//   if (query.isNewArrival !== undefined) {
+//     filters.isNewArrival =
+//       query.isNewArrival === 'true' || query.isNewArrival === true
+//   }
+
+//   if (query.isFeatured !== undefined) {
+//     filters.isFeatured =
+//       query.isFeatured === 'true' || query.isFeatured === true
+//   }
+
+//   if (query.isTrending !== undefined) {
+//     filters.isTrending =
+//       query.isTrending === 'true' || query.isTrending === true
+//   }
+
+//   if (query.isLatest !== undefined) {
+//     filters.isLatest = query.isLatest === 'true' || query.isLatest === true
+//   }
+
+//   if (query.isBestSelling !== undefined) {
+//     filters.isBestSelling =
+//       query.isBestSelling === 'true' || query.isBestSelling === true
+//   }
+
+//   if (query.isMostViewed !== undefined) {
+//     filters.isMostViewed =
+//       query.isMostViewed === 'true' || query.isMostViewed === true
+//   }
+
+//   if (query.isFlashSale !== undefined) {
+//     filters.isFlashSale =
+//       query.isFlashSale === 'true' || query.isFlashSale === true
+//   }
+
+//   if (query.size) {
+//     const sizeValues = Array.isArray(query.size)
+//       ? query.size.map(String)
+//       : [String(query.size)]
+//     variantQuery.size = { $in: sizeValues }
+//   }
+
+//   if (query.minPrice || query.maxPrice) {
+//     variantQuery.sellingPrice = {
+//       ...(query.minPrice ? { $gte: Number(query.minPrice) } : {}),
+//       ...(query.maxPrice ? { $lte: Number(query.maxPrice) } : {}),
+//     }
+//   }
+
+//   if (Object.keys(variantQuery).length > 0) {
+//     const matchingVariants = await Variant.find(variantQuery).select(
+//       'productId'
+//     )
+//     const productIds = [
+//       ...new Set(matchingVariants.map(v => v.productId.toString())),
+//     ]
+//     if (productIds.length === 0) {
+//       return {
+//         meta: {
+//           page: Number(query.page || 1),
+//           limit: Number(query.limit || 10),
+//           total: 0,
+//           totalPage: 0,
+//         },
+//         result: [],
+//       }
+//     }
+//     filters._id = { $in: productIds }
+//   }
+
+//   // 2️⃣ Handle Category/Subcategory/Brand Filtering using ObjectId directly
+
+//   if (query.category) {
+//     // Validate if it's a valid ObjectId
+//     if (Types.ObjectId.isValid(String(query.category))) {
+//       filters.category = new Types.ObjectId(String(query.category))
+//     }
+//   }
+
+//   if (query.subcategory) {
+//     if (Types.ObjectId.isValid(String(query.subcategory))) {
+//       filters.subcategory = new Types.ObjectId(String(query.subcategory))
+//     }
+//   }
+
+//   if (query.brand) {
+//     if (Types.ObjectId.isValid(String(query.brand))) {
+//       filters.brand = new Types.ObjectId(String(query.brand))
+//     }
+//   }
+
+//   if (query.secondarySubcategory) {
+//     if (Types.ObjectId.isValid(String(query.secondarySubcategory))) {
+//       filters.secondarySubcategory = new Types.ObjectId(
+//         String(query.secondarySubcategory)
+//       )
+//     }
+//   }
+
+//   // 3️⃣ Handle Search Term Across Product and Variant Fields
+//   if (query.searchTerm && typeof query.searchTerm === 'string') {
+//     const terms = query.searchTerm.trim().split(/\s+/)
+//     const searchConditions: any[] = []
+
+//     terms.forEach(term => {
+//       const regex = { $regex: term, $options: 'i' }
+//       searchAbleFields.forEach(field => {
+//         searchConditions.push({ [field]: regex })
+//       })
+//       // Optional: search inside variant features
+//       searchConditions.push({ 'variants.features': regex })
+//     })
+
+//     filters.$or = searchConditions
+//   }
+
+//   // 4️⃣ Build Final Query
+//   const productQuery = Product.find(filters)
+//     .populate('brand')
+//     .populate('category')
+//     .populate('subcategory')
+//     .populate('secondarySubcategory')
+//     .populate('variant')
+
+//   const queryBuilder = new QueryBuilder(productQuery, query)
+//   const result = await queryBuilder.sort().pagination().fields().modelQuery
+//   const meta = await queryBuilder.countTotal()
+
+//   return {
+//     meta,
+//     result,
+//   }
+// }
+
 const getAllProducts = async (query: Record<string, unknown>) => {
-  const searchAbleFields = ['productName', 'description', 'barCodeNumber']
+  console.log('query', query)
+  const textSearchAbleFields = ['productName', 'description'] // Text fields for regex search
+  const numericSearchAbleFields = ['barCodeNumber'] // Numeric fields for exact match
   const filters: Record<string, any> = { isActive: true }
 
   // 1️⃣ Handle Variant-Based Filtering (color, size, minPrice, maxPrice)
@@ -90,39 +237,22 @@ const getAllProducts = async (query: Record<string, unknown>) => {
     variantQuery.color = { $regex: String(query.color), $options: 'i' }
   }
 
-  if (query.isNewArrival !== undefined) {
-    filters.isNewArrival =
-      query.isNewArrival === 'true' || query.isNewArrival === true
-  }
+  // Handle boolean flags
+  const booleanFlags = [
+    'isNewArrival',
+    'isFeatured',
+    'isTrending',
+    'isLatest',
+    'isBestSelling',
+    'isMostViewed',
+    'isFlashSale',
+  ]
 
-  if (query.isFeatured !== undefined) {
-    filters.isFeatured =
-      query.isFeatured === 'true' || query.isFeatured === true
-  }
-
-  if (query.isTrending !== undefined) {
-    filters.isTrending =
-      query.isTrending === 'true' || query.isTrending === true
-  }
-
-  if (query.isLatest !== undefined) {
-    filters.isLatest = query.isLatest === 'true' || query.isLatest === true
-  }
-
-  if (query.isBestSelling !== undefined) {
-    filters.isBestSelling =
-      query.isBestSelling === 'true' || query.isBestSelling === true
-  }
-
-  if (query.isMostViewed !== undefined) {
-    filters.isMostViewed =
-      query.isMostViewed === 'true' || query.isMostViewed === true
-  }
-
-  if (query.isFlashSale !== undefined) {
-    filters.isFlashSale =
-      query.isFlashSale === 'true' || query.isFlashSale === true
-  }
+  booleanFlags.forEach(flag => {
+    if (query[flag] !== undefined) {
+      filters[flag] = query[flag] === 'true' || query[flag] === true
+    }
+  })
 
   if (query.size) {
     const sizeValues = Array.isArray(query.size)
@@ -159,58 +289,42 @@ const getAllProducts = async (query: Record<string, unknown>) => {
     filters._id = { $in: productIds }
   }
 
-  // 2️⃣ Handle Category/Subcategory/Brand Filtering
-  const [category, subcategory, brand, secondarySubcategory] =
-    await Promise.all([
-      query.category
-        ? Category.findOne({
-            categoryName: { $regex: String(query.category), $options: 'i' },
-          }).select('_id')
-        : null,
-      query.subcategory
-        ? Subcategory.findOne({
-            subcategoryName: {
-              $regex: String(query.subcategory),
-              $options: 'i',
-            },
-          }).select('_id')
-        : null,
-      query.brand
-        ? Brand.findOne({
-            brandName: { $regex: String(query.brand), $options: 'i' },
-          }).select('_id')
-        : null,
-      query.secondarySubcategory
-        ? SecondarySubcategory.findOne({
-            secondarySubcategoryName: {
-              $regex: String(query.secondarySubcategory),
-              $options: 'i',
-            },
-          }).select('_id')
-        : null,
-    ])
+  // 2️⃣ Handle Category/Subcategory/Brand Filtering using ObjectId directly
+  const idFields = ['category', 'subcategory', 'brand', 'secondarySubcategory']
 
-  if (category) filters.category = category._id
-  if (subcategory) filters.subcategory = subcategory._id
-  if (brand) filters.brand = brand._id
-  if (secondarySubcategory)
-    filters.secondarySubcategory = secondarySubcategory._id
+  idFields.forEach(field => {
+    if (query[field] && Types.ObjectId.isValid(String(query[field]))) {
+      filters[field] = new Types.ObjectId(String(query[field]))
+    }
+  })
 
-  // 3️⃣ Handle Search Term Across Product and Variant Fields
+  // 3️⃣ Handle Search Term - Fixed to handle both text and numeric fields
   if (query.searchTerm && typeof query.searchTerm === 'string') {
-    const terms = query.searchTerm.trim().split(/\s+/)
+    const searchTerm = query.searchTerm.trim()
     const searchConditions: any[] = []
 
-    terms.forEach(term => {
-      const regex = { $regex: term, $options: 'i' }
-      searchAbleFields.forEach(field => {
+    // Handle numeric search (for barCodeNumber)
+    if (!isNaN(Number(searchTerm))) {
+      numericSearchAbleFields.forEach(field => {
+        searchConditions.push({ [field]: Number(searchTerm) })
+      })
+    }
+
+    // Handle text search (for productName, description, etc.)
+    if (searchTerm.length > 0) {
+      const regex = { $regex: searchTerm, $options: 'i' }
+      textSearchAbleFields.forEach(field => {
         searchConditions.push({ [field]: regex })
       })
-      // Optional: search inside variant features
-      searchConditions.push({ 'variants.features': regex })
-    })
 
-    filters.$or = searchConditions
+      // Search inside variant features
+      searchConditions.push({ 'variants.features': regex })
+    }
+
+    // Only add $or if we have search conditions
+    if (searchConditions.length > 0) {
+      filters.$or = searchConditions
+    }
   }
 
   // 4️⃣ Build Final Query

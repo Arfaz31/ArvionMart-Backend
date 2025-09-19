@@ -62,13 +62,23 @@ const getSecondarySubcategoryByCategoryId = async (id: string) => {
   // Find all secondary subcategories that belong to those subcategories
   const result = await SecondarySubcategory.find({
     subcategory: { $in: subcategoryIds },
+  }).populate({
+    path: 'subcategory',
+    populate: {
+      path: 'category',
+    },
   })
 
   return result
 }
 
 const getSecondarySubCategoryById = async (id: string) => {
-  const result = await SecondarySubcategory.findById(id)
+  const result = await SecondarySubcategory.findById(id).populate({
+    path: 'subcategory',
+    populate: {
+      path: 'category',
+    },
+  })
   return result
 }
 

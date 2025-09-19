@@ -23,7 +23,7 @@ router.get('/active-sidebanner', SideBannerController.getActiveSideBannerFromDB)
 router.patch(
   '/update-sidebanner/:id',
   updloadSingleImage('sidebanner-image'),
-  validateRequestedFileData(SideBannerValidation.SideBannerSchema),
+  validateRequestedFileData(SideBannerValidation.updateSideBannerSchema),
   SideBannerController.updateSideBannerIntoDB
 )
 
