@@ -17,7 +17,7 @@ router.post(
 )
 
 router.get('/get-all-promo-card', PromoCardController.getAllPromoBannerDB)
-router.get('get-all-active-promo-card', PromoCardController.getActivePromoCard)
+router.get('/get-all-active-promo-card', PromoCardController.getActivePromoCard)
 
 router.patch(
   '/update-promo-card/:id',
