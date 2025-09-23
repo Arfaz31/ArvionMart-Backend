@@ -47,7 +47,7 @@ const getAllPromotionalBanner = async (query: Record<string, unknown>) => {
 }
 
 const getActivePromotionalBanner = async () => {
-  const banner = await PromotionalBanner.find({ status: 'ACTIVE' })
+  const banner = await PromotionalBanner.find({ status: 'ACTIVE' }).limit(5)
   return banner
 }
 

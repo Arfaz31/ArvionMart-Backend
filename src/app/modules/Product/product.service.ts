@@ -371,7 +371,6 @@ const getIsFeaturedProduct = async () => {
 
 const getNewArrivals = async () => {
   const result = await Product.find({
-    isDeleted: false,
     isActive: true,
     isNewArrival: true,
   })
@@ -683,7 +682,6 @@ const deleteProduct = async (id: string) => {
 const getProductsByCategory = async (categoryId: string) => {
   const result = await Product.find({
     category: categoryId,
-    isDeleted: false,
     isActive: true,
   })
     .populate('brand')
@@ -697,7 +695,6 @@ const getProductsByCategory = async (categoryId: string) => {
 const getProductsByBrand = async (brandId: string) => {
   const result = await Product.find({
     brand: brandId,
-    isDeleted: false,
     isActive: true,
   })
     .populate('brand')

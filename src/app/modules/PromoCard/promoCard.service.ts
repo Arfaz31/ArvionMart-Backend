@@ -44,6 +44,17 @@ const getPromoCard = async (query: Record<string, unknown>) => {
   }
 }
 
+const getActivePromoCard = async () => {
+  const result = await PromoCard.find({ status: 'ACTIVE', isDeleted: false })
+    .populate('categoryId')
+    .populate('subcategoryId')
+    .populate('secondarySubcategoryId')
+    .populate('productId')
+    .limit(12)
+
+  return result
+}
+
 const updatePromoCard = async (
   id: string,
   payload: Partial<IPromoCard>,
@@ -78,6 +89,7 @@ const deletePormoCard = async (id: string) => {
 export const PromoCardService = {
   createPromoCard,
   getPromoCard,
+  getActivePromoCard,
   updatePromoCard,
   deletePormoCard,
 }
