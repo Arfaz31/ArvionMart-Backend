@@ -21,6 +21,7 @@ app.use(
       'http://localhost:3000',
       'https://arvion-mart-frontend-rho.vercel.app',
       'https://arvionmart.vercel.app',
+      'https://arvion-mart.vercel.app',
     ],
     credentials: true,
   })

@@ -71,7 +71,11 @@ const getAllBrandOffers = async (query: Record<string, unknown>) => {
 }
 
 const getTopBrandOffers = async () => {
-  const result = await BrandOffer.find({ isTopBrand: true, isDeleted: false })
+  const result = await BrandOffer.find({
+    isTopBrand: true,
+    isDeleted: false,
+    status: 'ACTIVE',
+  })
     .populate('brandId')
     .limit(10)
   return result
