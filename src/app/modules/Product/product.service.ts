@@ -364,6 +364,23 @@ const getIsFeaturedProduct = async () => {
     .populate('subcategory')
     .populate('secondarySubcategory')
     .populate('variant')
+    .limit(18)
+
+  return result
+}
+
+const getNewArrivals = async () => {
+  const result = await Product.find({
+    isDeleted: false,
+    isActive: true,
+    isNewArrival: true,
+  })
+    .populate('brand')
+    .populate('category')
+    .populate('subcategory')
+    .populate('variant')
+    .sort({ createdAt: -1 })
+    .limit(18)
 
   return result
 }
@@ -378,6 +395,7 @@ const getIsTrendingProduct = async () => {
     .populate('subcategory')
     .populate('secondarySubcategory')
     .populate('variant')
+    .limit(18)
 
   return result
 }
@@ -392,6 +410,7 @@ const getIsLatestProduct = async () => {
     .populate('subcategory')
     .populate('secondarySubcategory')
     .populate('variant')
+    .limit(10)
 
   return result
 }
@@ -406,6 +425,7 @@ const getIsBestSellingProduct = async () => {
     .populate('subcategory')
     .populate('secondarySubcategory')
     .populate('variant')
+    .limit(10)
 
   return result
 }
@@ -420,6 +440,7 @@ const getIsMostViewedProduct = async () => {
     .populate('subcategory')
     .populate('secondarySubcategory')
     .populate('variant')
+    .limit(10)
 
   return result
 }
@@ -434,6 +455,7 @@ const getIsFlashSaleProduct = async () => {
     .populate('subcategory')
     .populate('secondarySubcategory')
     .populate('variant')
+    .limit(18)
 
   return result
 }
@@ -655,22 +677,6 @@ const deleteProduct = async (id: string) => {
       new: true,
     }
   )
-  return result
-}
-
-const getNewArrivals = async () => {
-  const result = await Product.find({
-    isDeleted: false,
-    isActive: true,
-    isNewArrival: true,
-  })
-    .populate('brand')
-    .populate('category')
-    .populate('subcategory')
-    .populate('variant')
-    .sort({ createdAt: -1 })
-    .limit(10)
-
   return result
 }
 
