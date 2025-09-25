@@ -23,11 +23,12 @@ const getAllBrand = catchAsync(async (req, res) => {
 })
 
 const getActiveBrand = catchAsync(async (req, res) => {
-  const result = await BrandService.getActiveBrand()
+  const result = await BrandService.getActiveBrand(req.query)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Brand get successfully',
-    data: result,
+    meta: result.count,
+    data: result.brandQuery,
   })
 })
 

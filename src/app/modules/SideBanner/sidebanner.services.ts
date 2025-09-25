@@ -60,6 +60,7 @@ const getActiveSideBanner = async () => {
     .populate('secondarySubcategoryId')
     .populate('productId')
     .populate('brandId')
+    .limit(2)
   return banner
 }
 

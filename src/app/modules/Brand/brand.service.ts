@@ -28,9 +28,21 @@ const getAllBrand = async (query: Record<string, unknown>) => {
   }
 }
 
-const getActiveBrand = async () => {
-  const result = await Brand.find({ status: 'ACTIVE' }).populate('category')
-  return result
+const getActiveBrand = async (query: Record<string, unknown>) => {
+  const brandQuery = await new QueryBuilder(
+    Brand.find({ isDeleted: false, status: 'ACTIVE' }).populate('category'),
+    query
+  )
+    .search(searchableFields)
+    .filter()
+    .sort()
+    .pagination()
+    .fields().modelQuery
+  const count = await new QueryBuilder(Brand.find(), query).countTotal()
+  return {
+    count,
+    brandQuery,
+  }
 }
 
 const getBrandById = async (id: string) => {
