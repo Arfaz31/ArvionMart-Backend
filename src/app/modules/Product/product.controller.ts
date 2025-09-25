@@ -13,16 +13,6 @@ const createProduct = catchAsync(async (req, res) => {
   })
 })
 
-// const getProductByVendor = catchAsync(async (req, res) => {
-//   const result = await ProductService.getProductByVendor(req)
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     message: 'Vendor Product retrieved successfully',
-//     meta: result?.meta,
-//     data: result?.result,
-//   })
-// })
-
 const getAllProducts = catchAsync(async (req, res) => {
   const result = await ProductService.getAllProducts(req.query)
   sendResponse(res, {

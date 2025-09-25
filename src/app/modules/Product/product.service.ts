@@ -2,7 +2,7 @@ import { Request } from 'express'
 import { Product } from './product.model'
 import { AppError } from '../../Error/AppError'
 import httpStatus from 'http-status'
-import mongoose, { Types } from 'mongoose'
+import { Types } from 'mongoose'
 import { Category } from '../Category/category.model'
 import { Subcategory } from '../Subcategory/subcategory.model'
 import { Brand } from '../Brand/brand.model'
@@ -11,6 +11,8 @@ import { Variant } from '../Variant/variant.model'
 import { Vendor } from '../Vendor/vendor.model'
 import { SecondarySubcategory } from '../SecondarySubcategory/SecondarySubcategory.model'
 import { generateSku } from './product.utility'
+import { getOrSetCache } from '../../redis/cache'
+import { clearProductCache } from '../../redis/clearCache'
 
 const generate13DigitBarcode = (): number => {
   const random12Digits = Math.floor(Math.random() * 1_000_000_000_000) // max 12 digits
@@ -75,55 +77,44 @@ const createProductIntoDB = async (req: Request) => {
 
   // ✅ Create product
   const result = await Product.create(payload)
+  // ✅ Clear product cache
+  await clearProductCache()
   return result
 }
 
-//get all product
 // const getAllProducts = async (query: Record<string, unknown>) => {
-//   console.log('query', query)
-//   const searchAbleFields = ['productName', 'description', 'barCodeNumber']
+//   //Depend on query object to generate unique cache key
+//   const cacheKey = `products:all:${JSON.stringify(query)}`
+//   // console.log('cacheKey', cacheKey)
+//   // console.log('Fetching products from database for query:', query)
+
+//   const textSearchAbleFields = ['productName', 'description'] // Text fields for regex search
+//   const numericSearchAbleFields = ['barCodeNumber'] // Numeric fields for exact match
 //   const filters: Record<string, any> = { isActive: true }
 
-//   //1️⃣ Handle Variant-Based Filtering (color, size, minPrice, maxPrice)
+//   // 1️⃣ Handle Variant-Based Filtering (color, size, minPrice, maxPrice)
 //   const variantQuery: Record<string, any> = {}
 
 //   if (query.color) {
 //     variantQuery.color = { $regex: String(query.color), $options: 'i' }
 //   }
 
-//   if (query.isNewArrival !== undefined) {
-//     filters.isNewArrival =
-//       query.isNewArrival === 'true' || query.isNewArrival === true
-//   }
+//   // Handle boolean flags
+//   const booleanFlags = [
+//     'isNewArrival',
+//     'isFeatured',
+//     'isTrending',
+//     'isLatest',
+//     'isBestSelling',
+//     'isMostViewed',
+//     'isFlashSale',
+//   ]
 
-//   if (query.isFeatured !== undefined) {
-//     filters.isFeatured =
-//       query.isFeatured === 'true' || query.isFeatured === true
-//   }
-
-//   if (query.isTrending !== undefined) {
-//     filters.isTrending =
-//       query.isTrending === 'true' || query.isTrending === true
-//   }
-
-//   if (query.isLatest !== undefined) {
-//     filters.isLatest = query.isLatest === 'true' || query.isLatest === true
-//   }
-
-//   if (query.isBestSelling !== undefined) {
-//     filters.isBestSelling =
-//       query.isBestSelling === 'true' || query.isBestSelling === true
-//   }
-
-//   if (query.isMostViewed !== undefined) {
-//     filters.isMostViewed =
-//       query.isMostViewed === 'true' || query.isMostViewed === true
-//   }
-
-//   if (query.isFlashSale !== undefined) {
-//     filters.isFlashSale =
-//       query.isFlashSale === 'true' || query.isFlashSale === true
-//   }
+//   booleanFlags.forEach(flag => {
+//     if (query[flag] !== undefined) {
+//       filters[flag] = query[flag] === 'true' || query[flag] === true
+//     }
+//   })
 
 //   if (query.size) {
 //     const sizeValues = Array.isArray(query.size)
@@ -161,49 +152,41 @@ const createProductIntoDB = async (req: Request) => {
 //   }
 
 //   // 2️⃣ Handle Category/Subcategory/Brand Filtering using ObjectId directly
+//   const idFields = ['category', 'subcategory', 'brand', 'secondarySubcategory']
 
-//   if (query.category) {
-//     // Validate if it's a valid ObjectId
-//     if (Types.ObjectId.isValid(String(query.category))) {
-//       filters.category = new Types.ObjectId(String(query.category))
+//   idFields.forEach(field => {
+//     if (query[field] && Types.ObjectId.isValid(String(query[field]))) {
+//       filters[field] = new Types.ObjectId(String(query[field]))
 //     }
-//   }
+//   })
 
-//   if (query.subcategory) {
-//     if (Types.ObjectId.isValid(String(query.subcategory))) {
-//       filters.subcategory = new Types.ObjectId(String(query.subcategory))
-//     }
-//   }
-
-//   if (query.brand) {
-//     if (Types.ObjectId.isValid(String(query.brand))) {
-//       filters.brand = new Types.ObjectId(String(query.brand))
-//     }
-//   }
-
-//   if (query.secondarySubcategory) {
-//     if (Types.ObjectId.isValid(String(query.secondarySubcategory))) {
-//       filters.secondarySubcategory = new Types.ObjectId(
-//         String(query.secondarySubcategory)
-//       )
-//     }
-//   }
-
-//   // 3️⃣ Handle Search Term Across Product and Variant Fields
+//   // 3️⃣ Handle Search Term - Fixed to handle both text and numeric fields
 //   if (query.searchTerm && typeof query.searchTerm === 'string') {
-//     const terms = query.searchTerm.trim().split(/\s+/)
+//     const searchTerm = query.searchTerm.trim()
 //     const searchConditions: any[] = []
 
-//     terms.forEach(term => {
-//       const regex = { $regex: term, $options: 'i' }
-//       searchAbleFields.forEach(field => {
+//     // Handle numeric search (for barCodeNumber)
+//     if (!isNaN(Number(searchTerm))) {
+//       numericSearchAbleFields.forEach(field => {
+//         searchConditions.push({ [field]: Number(searchTerm) })
+//       })
+//     }
+
+//     // Handle text search (for productName, description, etc.)
+//     if (searchTerm.length > 0) {
+//       const regex = { $regex: searchTerm, $options: 'i' }
+//       textSearchAbleFields.forEach(field => {
 //         searchConditions.push({ [field]: regex })
 //       })
-//       // Optional: search inside variant features
-//       searchConditions.push({ 'variants.features': regex })
-//     })
 
-//     filters.$or = searchConditions
+//       // Search inside variant features
+//       searchConditions.push({ 'variants.features': regex })
+//     }
+
+//     // Only add $or if we have search conditions
+//     if (searchConditions.length > 0) {
+//       filters.$or = searchConditions
+//     }
 //   }
 
 //   // 4️⃣ Build Final Query
@@ -223,126 +206,144 @@ const createProductIntoDB = async (req: Request) => {
 //     result,
 //   }
 // }
-
 const getAllProducts = async (query: Record<string, unknown>) => {
-  console.log('query', query)
-  const textSearchAbleFields = ['productName', 'description'] // Text fields for regex search
-  const numericSearchAbleFields = ['barCodeNumber'] // Numeric fields for exact match
-  const filters: Record<string, any> = { isActive: true }
+  // ১. প্রতিটি ভিন্ন কুয়েরির জন্য একটি ইউনিক ক্যাশ কী তৈরি করা হয়েছে।
+  const cacheKey = `products:all:${JSON.stringify(query)}`
 
-  // 1️⃣ Handle Variant-Based Filtering (color, size, minPrice, maxPrice)
-  const variantQuery: Record<string, any> = {}
+  // ২. getOrSetCache ফাংশনটি কল করা হয়েছে।
+  // এটি প্রথমে cacheKey দিয়ে ডেটা খুঁজবে। না পেলে ভেতরের ফাংশনটি (callback)  করবে।
+  return getOrSetCache(cacheKey, async () => {
+    // ---- নিচের সম্পূর্ণ কোডটি শুধুমাত্র CACHE MISS হলেই রান হবে ----
 
-  if (query.color) {
-    variantQuery.color = { $regex: String(query.color), $options: 'i' }
-  }
+    // console.log('Fetching products from database for query:', query)
 
-  // Handle boolean flags
-  const booleanFlags = [
-    'isNewArrival',
-    'isFeatured',
-    'isTrending',
-    'isLatest',
-    'isBestSelling',
-    'isMostViewed',
-    'isFlashSale',
-  ]
+    const textSearchAbleFields = ['productName', 'description']
+    const numericSearchAbleFields = ['barCodeNumber']
+    const filters: Record<string, any> = { isActive: true }
 
-  booleanFlags.forEach(flag => {
-    if (query[flag] !== undefined) {
-      filters[flag] = query[flag] === 'true' || query[flag] === true
+    // 1️⃣ Handle Variant-Based Filtering
+    const variantQuery: Record<string, any> = {}
+    if (query.color) {
+      variantQuery.color = { $regex: String(query.color), $options: 'i' }
     }
-  })
-
-  if (query.size) {
-    const sizeValues = Array.isArray(query.size)
-      ? query.size.map(String)
-      : [String(query.size)]
-    variantQuery.size = { $in: sizeValues }
-  }
-
-  if (query.minPrice || query.maxPrice) {
-    variantQuery.sellingPrice = {
-      ...(query.minPrice ? { $gte: Number(query.minPrice) } : {}),
-      ...(query.maxPrice ? { $lte: Number(query.maxPrice) } : {}),
-    }
-  }
-
-  if (Object.keys(variantQuery).length > 0) {
-    const matchingVariants = await Variant.find(variantQuery).select(
-      'productId'
-    )
-    const productIds = [
-      ...new Set(matchingVariants.map(v => v.productId.toString())),
+    const booleanFlags = [
+      'isNewArrival',
+      'isFeatured',
+      'isTrending',
+      'isLatest',
+      'isBestSelling',
+      'isMostViewed',
+      'isFlashSale',
     ]
-    if (productIds.length === 0) {
-      return {
-        meta: {
-          page: Number(query.page || 1),
-          limit: Number(query.limit || 10),
-          total: 0,
-          totalPage: 0,
-        },
-        result: [],
+    booleanFlags.forEach(flag => {
+      if (query[flag] !== undefined) {
+        filters[flag] = query[flag] === 'true' || query[flag] === true
+      }
+    })
+    if (query.size) {
+      const sizeValues = Array.isArray(query.size)
+        ? query.size.map(String)
+        : [String(query.size)]
+      variantQuery.size = { $in: sizeValues }
+    }
+    if (query.minPrice || query.maxPrice) {
+      variantQuery.sellingPrice = {
+        ...(query.minPrice ? { $gte: Number(query.minPrice) } : {}),
+        ...(query.maxPrice ? { $lte: Number(query.maxPrice) } : {}),
       }
     }
-    filters._id = { $in: productIds }
-  }
-
-  // 2️⃣ Handle Category/Subcategory/Brand Filtering using ObjectId directly
-  const idFields = ['category', 'subcategory', 'brand', 'secondarySubcategory']
-
-  idFields.forEach(field => {
-    if (query[field] && Types.ObjectId.isValid(String(query[field]))) {
-      filters[field] = new Types.ObjectId(String(query[field]))
+    if (Object.keys(variantQuery).length > 0) {
+      const matchingVariants = await Variant.find(variantQuery).select(
+        'productId'
+      )
+      const productIds = [
+        ...new Set(matchingVariants.map(v => v.productId.toString())),
+      ]
+      if (productIds.length === 0) {
+        return {
+          meta: {
+            page: Number(query.page || 1),
+            limit: Number(query.limit || 10),
+            total: 0,
+            totalPage: 0,
+          },
+          result: [],
+        }
+      }
+      filters._id = { $in: productIds }
     }
+
+    // 2️⃣ Handle Category/Subcategory/Brand Filtering
+    const idFields = [
+      'category',
+      'subcategory',
+      'brand',
+      'secondarySubcategory',
+    ]
+    idFields.forEach(field => {
+      if (query[field] && Types.ObjectId.isValid(String(query[field]))) {
+        filters[field] = new Types.ObjectId(String(query[field]))
+      }
+    })
+
+    // 3️⃣ Handle Search Term
+    if (query.searchTerm && typeof query.searchTerm === 'string') {
+      const searchTerm = query.searchTerm.trim()
+      const searchConditions: any[] = []
+      if (!isNaN(Number(searchTerm))) {
+        numericSearchAbleFields.forEach(field => {
+          searchConditions.push({ [field]: Number(searchTerm) })
+        })
+      }
+      if (searchTerm.length > 0) {
+        const regex = { $regex: searchTerm, $options: 'i' }
+        textSearchAbleFields.forEach(field => {
+          searchConditions.push({ [field]: regex })
+        })
+        searchConditions.push({ 'variants.features': regex })
+      }
+      if (searchConditions.length > 0) {
+        filters.$or = searchConditions
+      }
+    }
+
+    // 4️⃣ Build Final Query
+    const productQuery = Product.find(filters)
+      .populate('brand')
+      .populate('category')
+      .populate('subcategory')
+      .populate('secondarySubcategory')
+      .populate('variant')
+
+    const queryBuilder = new QueryBuilder(productQuery, query)
+    const result = await queryBuilder.sort().pagination().fields().modelQuery
+    const meta = await queryBuilder.countTotal()
+
+    return {
+      meta,
+      result,
+    }
+    // ---- CACHE MISS হলে এই পর্যন্ত কোড রান হয়ে ডেটা রিটার্ন করবে এবং ক্যাশে সেভ হবে ----
   })
+}
 
-  // 3️⃣ Handle Search Term - Fixed to handle both text and numeric fields
-  if (query.searchTerm && typeof query.searchTerm === 'string') {
-    const searchTerm = query.searchTerm.trim()
-    const searchConditions: any[] = []
+const getSingleProduct = async (id: string) => {
+  // ১. প্রোডাক্টের ID দিয়ে একটি সহজ এবং ইউনিক ক্যাশ কী তৈরি করা হয়েছে।
+  const cacheKey = `product:${id}`
 
-    // Handle numeric search (for barCodeNumber)
-    if (!isNaN(Number(searchTerm))) {
-      numericSearchAbleFields.forEach(field => {
-        searchConditions.push({ [field]: Number(searchTerm) })
-      })
-    }
+  // ২. getOrSetCache ফাংশনটি কল করা হয়েছে। ক্যাশে ডেটা থাকলে সাথে সাথে রিটার্ন করবে।
+  return getOrSetCache(cacheKey, async () => {
+    // ---- নিচের কোডটি শুধুমাত্র CACHE MISS হলেই রান হবে ----
+    console.log(`Fetching product from database for ID: ${id}`) // ডিবাগিং এর জন্য লগ
 
-    // Handle text search (for productName, description, etc.)
-    if (searchTerm.length > 0) {
-      const regex = { $regex: searchTerm, $options: 'i' }
-      textSearchAbleFields.forEach(field => {
-        searchConditions.push({ [field]: regex })
-      })
+    const result = await Product.findById(id)
+      .populate('brand')
+      .populate('category')
+      .populate('subcategory')
+      .populate('variant')
 
-      // Search inside variant features
-      searchConditions.push({ 'variants.features': regex })
-    }
-
-    // Only add $or if we have search conditions
-    if (searchConditions.length > 0) {
-      filters.$or = searchConditions
-    }
-  }
-
-  // 4️⃣ Build Final Query
-  const productQuery = Product.find(filters)
-    .populate('brand')
-    .populate('category')
-    .populate('subcategory')
-    .populate('secondarySubcategory')
-    .populate('variant')
-
-  const queryBuilder = new QueryBuilder(productQuery, query)
-  const result = await queryBuilder.sort().pagination().fields().modelQuery
-  const meta = await queryBuilder.countTotal()
-
-  return {
-    meta,
-    result,
-  }
+    return result
+  })
 }
 
 const getProductBySlug = async (slug: string) => {
@@ -563,22 +564,6 @@ const getIsFlashSaleProduct = async () => {
 //   }
 // }
 
-const getSingleProduct = async (id: string) => {
-  const result = await Product.findById(id)
-    .populate('brand')
-    .populate('category')
-    .populate('subcategory')
-    .populate('variant')
-
-  // const getAllVertiants = await Variant.find({ productId: result?._id })
-  // const resultWithVariants = {
-  //   ...result?.toObject(),
-  //   variants: getAllVertiants,
-  // }
-
-  return result
-}
-
 //get last single created product
 const getLastProduct = async (req: Request) => {
   const user = req.user
@@ -650,6 +635,8 @@ export const updateProduct = async (req: Request) => {
     }
   ).populate('variant')
 
+  await clearProductCache(_id)
+
   return updatedProduct
 }
 
@@ -676,6 +663,8 @@ const deleteProduct = async (id: string) => {
       new: true,
     }
   )
+
+  await clearProductCache(_id)
   return result
 }
 
@@ -712,24 +701,57 @@ const getTotalProductCount = async (req: Request) => {
   return result
 }
 
+// const getCategoryRelatedProductsFromDB = async (excludeProductId: string) => {
+//   const product = await Product.findById(excludeProductId)
+
+//   if (!product) {
+//     throw new Error('product not found')
+//   }
+
+//   const relatedProducts = await Product.find({
+//     category: product.category,
+//     _id: { $ne: excludeProductId },
+//   })
+//     .populate('brand')
+//     .populate('category')
+//     .populate('subcategory')
+//     .populate('variant')
+//   // Find all products with the same category ID, except for the product with this specific ID.
+
+//   return relatedProducts
+// }
+
 const getCategoryRelatedProductsFromDB = async (excludeProductId: string) => {
-  const product = await Product.findById(excludeProductId)
+  // ১. যে প্রোডাক্টের উপর ভিত্তি করে রিলেটেড প্রোডাক্ট খোঁজা হচ্ছে,
+  // তার ID দিয়ে একটি ইউনিক ক্যাশ কী তৈরি করা হলো।
+  const cacheKey = `products:related:${excludeProductId}`
 
-  if (!product) {
-    throw new Error('product not found')
-  }
+  // ২. getOrSetCache ফাংশন দিয়ে র‍্যাপ করা হলো।
+  return getOrSetCache(cacheKey, async () => {
+    // ---- শুধুমাত্র CACHE MISS হলেই এই ভেতরের কোড রান হবে ----
 
-  const relatedProducts = await Product.find({
-    category: product.category,
-    _id: { $ne: excludeProductId },
+    console.log(
+      `Fetching related products from DB for product ID: ${excludeProductId}`
+    )
+
+    const product = await Product.findById(excludeProductId)
+
+    if (!product) {
+      throw new Error('Product not found, cannot find related products.')
+    }
+
+    const relatedProducts = await Product.find({
+      category: product.category,
+      _id: { $ne: excludeProductId },
+    })
+      .limit(20)
+      .populate('brand')
+      .populate('category')
+      .populate('subcategory')
+      .populate('variant')
+
+    return relatedProducts
   })
-    .populate('brand')
-    .populate('category')
-    .populate('subcategory')
-    .populate('variant')
-  // Find all products with the same category ID, except for the product with this specific ID.
-
-  return relatedProducts
 }
 
 export const ProductService = {

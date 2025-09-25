@@ -6,6 +6,8 @@ import { AppError } from '../../Error/AppError'
 import { Product } from '../Product/product.model'
 import QueryBuilder from '../../builder/QueryBuilder'
 import mongoose from 'mongoose'
+import { deleteCache, deleteCacheByPattern } from '../../redis/cache'
+import { clearProductCache } from '../../redis/clearCache'
 
 export interface CustomFile extends Express.Multer.File {
   path: string
@@ -74,6 +76,11 @@ const createVariantIntoDB = async (req: Request) => {
     // Step 6: Commit and end transaction
     await session.commitTransaction()
     session.endSession()
+
+    // Step 7: Clear relevant caches AFTER the transaction is successful
+    if (productId) {
+      await clearProductCache(productId.toString())
+    }
 
     return newVariant
   } catch (error) {
@@ -232,6 +239,10 @@ const updateVariant = async (req: Request) => {
     new: true,
   }).populate('productId')
 
+  if (result && result.productId) {
+    await clearProductCache(_id)
+  }
+
   return result
 }
 
@@ -260,7 +271,9 @@ const deleteVariant = async (id: string) => {
 
     await session.commitTransaction()
     session.endSession()
-
+    if (result && result.productId) {
+      await clearProductCache(_id)
+    }
     return result
   } catch (error) {
     await session.abortTransaction()
@@ -271,17 +284,9 @@ const deleteVariant = async (id: string) => {
 
 const updateVariantQuantity = async (variantId: string, quantity: number) => {
   const variant = await Variant.findById(variantId)
-
-  // if (!variant) {
-  //   throw new AppError(httpStatus.NOT_FOUND, 'Variant not found')
-  // }
-
-  // if (variant.quantity + quantity < 0) {
-  //   throw new AppError(httpStatus.BAD_REQUEST, 'Insufficient stock quantity')
-  // }
-
-  // variant.quantity += quantity
-  // await variant.save()
+  if (variant && variant.productId) {
+    await clearProductCache(variantId)
+  }
 
   return variant
 }
