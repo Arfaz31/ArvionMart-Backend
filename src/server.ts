@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import config from './app/config'
 import { Server } from 'http'
 import seedSuperAdmin from './app/DB'
+import { checkRedisConnection } from './app/redis/redisClient'
 // import Logger from './app/core/Logger'
 
 const port = process.env.PORT || config.port
@@ -14,6 +15,7 @@ async function main() {
     // Connect to MongoDB and wait for it to finish
     await mongoose.connect(config.database_url as string)
     console.log('✅ Database connection successful!')
+    await checkRedisConnection()
     seedSuperAdmin()
     server = app.listen(port, () => {
       console.log(
@@ -44,3 +46,5 @@ process.on('uncaughtException', () => {
   console.log(`🤷‍♂️ Uncaught exception, shutting down...`)
   process.exit(1)
 })
+
+export default app
