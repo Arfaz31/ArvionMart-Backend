@@ -19,6 +19,7 @@ const ProductSchema = new Schema<IProduct>(
       type: String,
       required: [true, 'Product name is required'],
       trim: true,
+      index: true,
     },
 
     description: {
@@ -112,10 +113,16 @@ const ProductSchema = new Schema<IProduct>(
   }
 )
 
-// ProductSchema.virtual('variants', {
-//   ref: 'Variant',
-//   localField: '_id',
-//   foreignField: 'productId',
-// })
+// Index for faster Filter
+ProductSchema.index({ category: 1 })
+ProductSchema.index({ subcategory: 1 })
+ProductSchema.index({ brand: 1 })
+
+ProductSchema.index({ isActive: 1, isFeatured: 1 })
+ProductSchema.index({ isActive: 1, isNewArrival: 1 })
+ProductSchema.index({ isActive: 1, createdAt: -1 })
+
+// Text search: It will improve search performance
+ProductSchema.index({ productName: 'text', description: 'text' })
 
 export const Product = model<IProduct>('Product', ProductSchema)

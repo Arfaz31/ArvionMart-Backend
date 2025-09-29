@@ -2,6 +2,7 @@ import httpStatus from 'http-status'
 import catchAsync from '../../utils/catchAsync'
 import { ProductService } from './product.service'
 import sendResponse from '../../utils/sendResponse'
+import { generateEtag } from '../../utils/generateEtag'
 
 const createProduct = catchAsync(async (req, res) => {
   const result = await ProductService.createProductIntoDB(req)
@@ -13,8 +14,40 @@ const createProduct = catchAsync(async (req, res) => {
   })
 })
 
+// const getAllProducts = catchAsync(async (req, res) => {
+//   const result = await ProductService.getAllProducts(req.query)
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     message: 'Products retrieved successfully',
+//     meta: result?.meta,
+//     data: result.result,
+//   })
+// })
+
+// const getSingleProduct = catchAsync(async (req, res) => {
+//   const result = await ProductService.getSingleProduct(req.params.id)
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     message: 'Product retrieved successfully',
+//     data: result,
+//   })
+// })
+
 const getAllProducts = catchAsync(async (req, res) => {
   const result = await ProductService.getAllProducts(req.query)
+
+  const ETag = generateEtag({ meta: result?.meta, data: result.result })
+
+  if (req.headers['if-none-match'] === ETag) {
+    console.log('[match etag]', ETag === req.headers['if-none-match'])
+    res.status(httpStatus.NOT_MODIFIED).send() // 304 Not Modified
+    return
+  }
+
+  res.setHeader('ETag', ETag)
+
+  // console.log('[result]', result)
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Products retrieved successfully',
@@ -25,6 +58,16 @@ const getAllProducts = catchAsync(async (req, res) => {
 
 const getSingleProduct = catchAsync(async (req, res) => {
   const result = await ProductService.getSingleProduct(req.params.id)
+
+  // const etag = generateEtag(result)
+
+  // if (req.headers['if-none-match'] === etag) {
+  //   res.status(httpStatus.NOT_MODIFIED).send() // 304 Not Modified
+  //   return
+  // }
+
+  // res.setHeader('ETag', etag)
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Product retrieved successfully',
