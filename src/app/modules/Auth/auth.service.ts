@@ -221,7 +221,7 @@ const googleLogin = async (payload: IAuth) => {
       await session.endSession()
 
       const jwtPayload = {
-        _id: user[0]._id,
+        userId: user[0]._id,
         email: user[0].email,
         role: user[0].role,
       }
@@ -249,7 +249,7 @@ const googleLogin = async (payload: IAuth) => {
     }
   } else {
     const jwtPayload = {
-      _id: isUserExist?._id,
+      userId: isUserExist?._id,
       email: isUserExist?.email,
       role: isUserExist?.role,
     }
@@ -301,7 +301,7 @@ const vendorLogin = async (payload: IAuth) => {
   }
 
   const jwtPayload = {
-    _id: user._id,
+    userId: user._id,
     email: user.email,
     role: user.role,
     status: user.status,
@@ -338,7 +338,7 @@ const generateAccessToken = async (token: string) => {
   }
 
   const isUserExist = await User.findOne({
-    _id: decoded._id,
+    userId: decoded._id,
     status: 'ACTIVE',
     isDeleted: false,
   })
@@ -348,7 +348,7 @@ const generateAccessToken = async (token: string) => {
   }
 
   const jwtPayload = {
-    _id: isUserExist._id,
+    userId: isUserExist._id,
     email: isUserExist.email,
     role: isUserExist.role,
   }
@@ -386,7 +386,7 @@ const forgetPasswordLink = async (payload: IAuth) => {
   }
 
   const jwtPayload = {
-    _id: isUserExist._id,
+    userId: isUserExist._id,
     email: isUserExist.email,
     role: isUserExist.role,
   }

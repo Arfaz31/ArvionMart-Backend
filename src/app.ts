@@ -24,6 +24,14 @@ app.use(
       'https://arvion-mart.vercel.app',
     ],
     credentials: true,
+    exposedHeaders: [
+      'x-trace-id',
+      'x-correlation-id',
+      'ETag',
+      'if-none-match',
+      'if-match',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   })
 )
 app.use(helmet())

@@ -2,6 +2,7 @@ import catchAsync from '../../utils/catchAsync'
 import sendResponse from '../../utils/sendResponse'
 import httpStatus from 'http-status'
 import { CategoryService } from './category.service'
+import { generateEtag } from '../../utils/generateEtag'
 
 const createCategoryIntoDB = catchAsync(async (req, res) => {
   const result = await CategoryService.createCategory(req)
@@ -14,16 +15,32 @@ const createCategoryIntoDB = catchAsync(async (req, res) => {
 
 const getAllCategory = catchAsync(async (req, res) => {
   const result = await CategoryService.getAllCategory(req.query)
+  const ETag = generateEtag({ meta: result.meta, data: result.data })
+
+  if (req.headers['if-none-match'] === ETag) {
+    res.status(httpStatus.NOT_MODIFIED).send()
+    return
+  }
+  res.setHeader('ETag', ETag)
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Category get successfully',
-    meta: result.count,
-    data: result.categoriesWithProduct,
+    meta: result.meta,
+    data: result.data,
   })
 })
 
 const getCategoryById = catchAsync(async (req, res) => {
   const result = await CategoryService.getCategoryById(req.params.id)
+  // const etag = generateEtag(result)
+
+  // if (req.headers['if-none-match'] === etag) {
+  //   res.status(httpStatus.NOT_MODIFIED).send()
+  //   return
+  // }
+
+  // res.setHeader('ETag', etag)
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Category get successfully',
@@ -64,6 +81,14 @@ const getSidebarDataforFilterOperation = catchAsync(async (req, res) => {
   const result = await CategoryService.getSidebarDataforFilterOperation(
     req.query
   )
+  const ETag = generateEtag(result)
+
+  if (req.headers['if-none-match'] === ETag) {
+    res.status(httpStatus.NOT_MODIFIED).send()
+    return
+  }
+
+  res.setHeader('ETag', ETag)
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

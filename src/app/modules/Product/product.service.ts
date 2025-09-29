@@ -82,130 +82,6 @@ const createProductIntoDB = async (req: Request) => {
   return result
 }
 
-// const getAllProducts = async (query: Record<string, unknown>) => {
-//   //Depend on query object to generate unique cache key
-//   const cacheKey = `products:all:${JSON.stringify(query)}`
-//   // console.log('cacheKey', cacheKey)
-//   // console.log('Fetching products from database for query:', query)
-
-//   const textSearchAbleFields = ['productName', 'description'] // Text fields for regex search
-//   const numericSearchAbleFields = ['barCodeNumber'] // Numeric fields for exact match
-//   const filters: Record<string, any> = { isActive: true }
-
-//   // 1️⃣ Handle Variant-Based Filtering (color, size, minPrice, maxPrice)
-//   const variantQuery: Record<string, any> = {}
-
-//   if (query.color) {
-//     variantQuery.color = { $regex: String(query.color), $options: 'i' }
-//   }
-
-//   // Handle boolean flags
-//   const booleanFlags = [
-//     'isNewArrival',
-//     'isFeatured',
-//     'isTrending',
-//     'isLatest',
-//     'isBestSelling',
-//     'isMostViewed',
-//     'isFlashSale',
-//   ]
-
-//   booleanFlags.forEach(flag => {
-//     if (query[flag] !== undefined) {
-//       filters[flag] = query[flag] === 'true' || query[flag] === true
-//     }
-//   })
-
-//   if (query.size) {
-//     const sizeValues = Array.isArray(query.size)
-//       ? query.size.map(String)
-//       : [String(query.size)]
-//     variantQuery.size = { $in: sizeValues }
-//   }
-
-//   if (query.minPrice || query.maxPrice) {
-//     variantQuery.sellingPrice = {
-//       ...(query.minPrice ? { $gte: Number(query.minPrice) } : {}),
-//       ...(query.maxPrice ? { $lte: Number(query.maxPrice) } : {}),
-//     }
-//   }
-
-//   if (Object.keys(variantQuery).length > 0) {
-//     const matchingVariants = await Variant.find(variantQuery).select(
-//       'productId'
-//     )
-//     const productIds = [
-//       ...new Set(matchingVariants.map(v => v.productId.toString())),
-//     ]
-//     if (productIds.length === 0) {
-//       return {
-//         meta: {
-//           page: Number(query.page || 1),
-//           limit: Number(query.limit || 10),
-//           total: 0,
-//           totalPage: 0,
-//         },
-//         result: [],
-//       }
-//     }
-//     filters._id = { $in: productIds }
-//   }
-
-//   // 2️⃣ Handle Category/Subcategory/Brand Filtering using ObjectId directly
-//   const idFields = ['category', 'subcategory', 'brand', 'secondarySubcategory']
-
-//   idFields.forEach(field => {
-//     if (query[field] && Types.ObjectId.isValid(String(query[field]))) {
-//       filters[field] = new Types.ObjectId(String(query[field]))
-//     }
-//   })
-
-//   // 3️⃣ Handle Search Term - Fixed to handle both text and numeric fields
-//   if (query.searchTerm && typeof query.searchTerm === 'string') {
-//     const searchTerm = query.searchTerm.trim()
-//     const searchConditions: any[] = []
-
-//     // Handle numeric search (for barCodeNumber)
-//     if (!isNaN(Number(searchTerm))) {
-//       numericSearchAbleFields.forEach(field => {
-//         searchConditions.push({ [field]: Number(searchTerm) })
-//       })
-//     }
-
-//     // Handle text search (for productName, description, etc.)
-//     if (searchTerm.length > 0) {
-//       const regex = { $regex: searchTerm, $options: 'i' }
-//       textSearchAbleFields.forEach(field => {
-//         searchConditions.push({ [field]: regex })
-//       })
-
-//       // Search inside variant features
-//       searchConditions.push({ 'variants.features': regex })
-//     }
-
-//     // Only add $or if we have search conditions
-//     if (searchConditions.length > 0) {
-//       filters.$or = searchConditions
-//     }
-//   }
-
-//   // 4️⃣ Build Final Query
-//   const productQuery = Product.find(filters)
-//     .populate('brand')
-//     .populate('category')
-//     .populate('subcategory')
-//     .populate('secondarySubcategory')
-//     .populate('variant')
-
-//   const queryBuilder = new QueryBuilder(productQuery, query)
-//   const result = await queryBuilder.sort().pagination().fields().modelQuery
-//   const meta = await queryBuilder.countTotal()
-
-//   return {
-//     meta,
-//     result,
-//   }
-// }
 const getAllProducts = async (query: Record<string, unknown>) => {
   // ১. প্রতিটি ভিন্ন কুয়েরির জন্য একটি ইউনিক ক্যাশ কী তৈরি করা হয়েছে।
   const cacheKey = `products:all:${JSON.stringify(query)}`
@@ -286,24 +162,38 @@ const getAllProducts = async (query: Record<string, unknown>) => {
       }
     })
 
+    // if (query.searchTerm && typeof query.searchTerm === 'string') {
+    //   const searchTerm = query.searchTerm.trim()
+    //   const searchConditions: any[] = []
+    //   if (!isNaN(Number(searchTerm))) {
+    //     numericSearchAbleFields.forEach(field => {
+    //       searchConditions.push({ [field]: Number(searchTerm) })
+    //     })
+    //   }
+    //   if (searchTerm.length > 0) {
+    //     const regex = { $regex: searchTerm, $options: 'i' }
+    //     textSearchAbleFields.forEach(field => {
+    //       searchConditions.push({ [field]: regex })
+    //     })
+    //     searchConditions.push({ 'variants.features': regex })
+    //   }
+    //   if (searchConditions.length > 0) {
+    //     filters.$or = searchConditions
+    //   }
+    // }
     // 3️⃣ Handle Search Term
     if (query.searchTerm && typeof query.searchTerm === 'string') {
       const searchTerm = query.searchTerm.trim()
-      const searchConditions: any[] = []
-      if (!isNaN(Number(searchTerm))) {
-        numericSearchAbleFields.forEach(field => {
-          searchConditions.push({ [field]: Number(searchTerm) })
-        })
-      }
-      if (searchTerm.length > 0) {
-        const regex = { $regex: searchTerm, $options: 'i' }
-        textSearchAbleFields.forEach(field => {
-          searchConditions.push({ [field]: regex })
-        })
-        searchConditions.push({ 'variants.features': regex })
-      }
-      if (searchConditions.length > 0) {
-        filters.$or = searchConditions
+
+      // Use $text for efficient text search if the term is not purely numeric
+      if (isNaN(Number(searchTerm))) {
+        filters.$text = { $search: searchTerm }
+      } else {
+        // If it's a number, it could be a barcode or part of a name
+        filters.$or = [
+          { barCodeNumber: Number(searchTerm) },
+          { $text: { $search: searchTerm } },
+        ]
       }
     }
 
@@ -334,7 +224,7 @@ const getSingleProduct = async (id: string) => {
   // ২. getOrSetCache ফাংশনটি কল করা হয়েছে। ক্যাশে ডেটা থাকলে সাথে সাথে রিটার্ন করবে।
   return getOrSetCache(cacheKey, async () => {
     // ---- নিচের কোডটি শুধুমাত্র CACHE MISS হলেই রান হবে ----
-    console.log(`Fetching product from database for ID: ${id}`) // ডিবাগিং এর জন্য লগ
+    console.log(`Fetching product from database for ID: ${id}`)
 
     const result = await Product.findById(id)
       .populate('brand')

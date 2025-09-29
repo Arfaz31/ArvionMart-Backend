@@ -22,6 +22,8 @@ import { PointsOfferRoutes } from '../modules/PointsOffer/pointsoffer.route'
 import { LogoRoutes } from '../modules/Logo/logo.route'
 import { BlogRoutes } from '../modules/Blogs/blog.route'
 import { ContactInfoRoutes } from '../modules/ContactInfo/contactInfo.route'
+import { DemoRoutes } from '../modules/Demo/demo.route';
+
 
 const middlewareRoutes = Router()
 
@@ -117,6 +119,10 @@ const router = [
   {
     path: '/contact-info',
     routes: ContactInfoRoutes,
+  },
+  {
+    path: '/demo',
+    routes: DemoRoutes,
   },
 ]
 
