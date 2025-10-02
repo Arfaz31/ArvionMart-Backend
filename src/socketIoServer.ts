@@ -1,5 +1,6 @@
 import { Server as HttpServer } from 'http'
 import { Server as SocketIOServer, Socket } from 'socket.io'
+import { MessageServices } from './app/modules/Message/message.services'
 
 let activeUsers: Array<{ userId: string; socketId: string; role: string }> = []
 
@@ -14,55 +15,66 @@ export const socketServer = (server: HttpServer) => {
   io.on('connection', (socket: Socket) => {
     console.log(`Socket connected: ${socket.id}`)
 
-    // নতুন ব্যবহারকারী যোগ করা
     socket.on('new-user-add', (newUserId: string, role: string) => {
-      // Remove user if already exists (to handle reconnection)
       activeUsers = activeUsers.filter(user => user.userId !== newUserId)
-
       activeUsers.push({ userId: newUserId, socketId: socket.id, role })
       console.log('Active users:', activeUsers)
       io.emit('get-users', activeUsers)
     })
 
-    // সংযোগ বিচ্ছিন্ন হ্যান্ডেল করা
     socket.on('disconnect', () => {
       console.log(`Socket disconnected: ${socket.id}`)
       activeUsers = activeUsers.filter(user => user.socketId !== socket.id)
       io.emit('get-users', activeUsers)
     })
 
-    // একটি চ্যাট রুমে যোগদান করা - FIXED
     socket.on('join-chat', (chatId: string) => {
       socket.join(chatId)
       console.log(`User ${socket.id} joined chat room: ${chatId}`)
     })
 
-    // মেসেজ পাঠানো - FIXED
-    socket.on('send-message', data => {
-      console.log('Message received on server:', data)
+    // Text message এর জন্য
+    socket.on('send-message', async data => {
+      try {
+        // console.log('Processing text message:', data)
 
-      // Send to specific chat room
-      socket.to(data.chatId).emit('receive-message', data)
+        // Save message to database
+        const savedMessage = await MessageServices.addMessageFromSocket(data)
+        console.log('Message saved:', savedMessage._id)
 
-      // Also send to sender for immediate update
-      socket.emit('receive-message', data)
+        // Broadcast to ALL users in the chat room (including sender)
+        io.in(data.chatId).emit('receive-message', savedMessage)
+        console.log('Message broadcasted to room:', data.chatId)
+      } catch (error) {
+        console.error('Error processing message:', error)
+        socket.emit('message-error', {
+          error: 'Failed to send message',
+          originalMessage: data,
+        })
+      }
     })
 
-    // অ্যাডমিন যখন একটি চ্যাট দেখছেন
-    socket.on('admin-viewing-chat', ({ chatId, adminName }) => {
-      socket.to(chatId).emit('viewing-indicator', `${adminName} is viewing...`)
+    // File message API থেকে আসলে এটা broadcast করবে
+    socket.on('file-message-sent', messageData => {
+      try {
+        console.log('Broadcasting file message:', messageData._id)
+        // যে message API থেকে create হয়েছে সেটা broadcast করুন
+        io.in(messageData.chatId.toString()).emit(
+          'receive-message',
+          messageData
+        )
+        console.log('File message broadcasted to room:', messageData.chatId)
+      } catch (error) {
+        console.error('Error broadcasting file message:', error)
+      }
     })
 
-    // অ্যাডমিন যখন টাইপ করা শুরু করবেন
-    socket.on('admin-typing-start', ({ chatId, adminName }) => {
-      socket
-        .to(chatId)
-        .emit('typing-indicator-start', `${adminName} is typing...`)
+    socket.on('typing-start', ({ chatId, userName }) => {
+      socket.to(chatId).emit('typing-indicator', { userName, isTyping: true })
     })
 
-    // অ্যাডমিন যখন টাইপ করা বন্ধ করবেন
-    socket.on('admin-typing-stop', ({ chatId }) => {
-      socket.to(chatId).emit('typing-indicator-stop')
+    socket.on('typing-stop', ({ chatId }) => {
+      socket.to(chatId).emit('typing-indicator', { isTyping: false })
     })
   })
 }
