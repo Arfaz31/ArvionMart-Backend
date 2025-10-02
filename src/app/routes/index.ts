@@ -22,8 +22,9 @@ import { PointsOfferRoutes } from '../modules/PointsOffer/pointsoffer.route'
 import { LogoRoutes } from '../modules/Logo/logo.route'
 import { BlogRoutes } from '../modules/Blogs/blog.route'
 import { ContactInfoRoutes } from '../modules/ContactInfo/contactInfo.route'
-import { DemoRoutes } from '../modules/Demo/demo.route';
-
+import { DemoRoutes } from '../modules/Demo/demo.route'
+import { ChatRoutes } from '../modules/Chat/chat.route'
+import { MessageRoutes } from '../modules/Message/message.route'
 
 const middlewareRoutes = Router()
 
@@ -124,6 +125,8 @@ const router = [
     path: '/demo',
     routes: DemoRoutes,
   },
+  { path: '/chat', routes: ChatRoutes },
+  { path: '/message', routes: MessageRoutes },
 ]
 
 router.forEach(route => middlewareRoutes.use(route.path, route.routes))
