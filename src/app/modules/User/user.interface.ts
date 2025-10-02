@@ -13,4 +13,6 @@ export interface IUser {
   isDeleted: boolean
   otp?: string
   otpExpiresAt?: Date
+  failedOtpAttempts?: number
+  otpLockoutUntil?: Date
 }

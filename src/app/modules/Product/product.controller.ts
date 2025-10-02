@@ -45,9 +45,7 @@ const getAllProducts = catchAsync(async (req, res) => {
   }
 
   res.setHeader('ETag', ETag)
-
   // console.log('[result]', result)
-
   sendResponse(res, {
     statusCode: httpStatus.OK,
     message: 'Products retrieved successfully',

@@ -6,7 +6,6 @@ import { AppError } from '../../Error/AppError'
 import { Product } from '../Product/product.model'
 import QueryBuilder from '../../builder/QueryBuilder'
 import mongoose from 'mongoose'
-import { deleteCache, deleteCacheByPattern } from '../../redis/cache'
 import { clearProductCache } from '../../redis/clearCache'
 
 export interface CustomFile extends Express.Multer.File {

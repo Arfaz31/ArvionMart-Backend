@@ -5,7 +5,7 @@ import { Server } from 'http'
 import seedSuperAdmin from './app/DB'
 import { checkRedisConnection } from './app/redis/redisClient'
 // import Logger from './app/core/Logger'
-
+import { socketServer } from './socketIoServer'
 const port = process.env.PORT || config.port
 
 let server: Server
@@ -25,6 +25,8 @@ async function main() {
       //   `🚀 ArvionMart server is running at http://192.168.0.104:${port}`
       // )
     })
+    // Pass the server instance to initialize Socket.IO
+    socketServer(server)
   } catch (error) {
     console.error('❌ Failed to connect to the database:', error)
   }

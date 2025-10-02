@@ -44,6 +44,13 @@ const userSchema = new Schema<IUser>(
     otpExpiresAt: {
       type: Date,
     },
+    failedOtpAttempts: {
+      type: Number,
+      default: 0,
+    },
+    otpLockoutUntil: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
@@ -56,7 +63,7 @@ userSchema.pre('save', async function (next) {
     const isExisting = await User.findOne({
       contactNumber: user.contactNumber,
     })
-    if (isExisting) {
+    if (isExisting && this.isNew) {
       throw new AppError(HttpStatus.BAD_REQUEST, 'User already exists')
     }
   }
