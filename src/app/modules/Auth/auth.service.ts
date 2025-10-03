@@ -5,7 +5,7 @@ import httpStatus, { status } from 'http-status'
 import bcrypt from 'bcryptjs'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { sendEmail } from '../../utils/sendEmail'
-import { resetHtmlBody } from '../../view/resetPassword'
+// import { resetHtmlBody } from '../../view/resetPassword'
 import { Customers } from '../Customers/customers.model'
 import config from '../../config'
 import { jwtHelper } from '../../utils/jwtHelper'
@@ -87,7 +87,7 @@ const loginUser = async (payload: IAuth) => {
 
   // step 4: send OTP to user's email
   const html = optgenerateHtmlSendForUser(otp)
-  await sendEmail(
+  sendEmail(
     user.email!,
     html,
     'Arvion Mart - OTP Verification',
