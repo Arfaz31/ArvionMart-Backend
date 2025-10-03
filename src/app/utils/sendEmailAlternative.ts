@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+import config from '../config'
 
 export const sendEmailAlternative = async (
   email: string,
@@ -13,14 +14,14 @@ export const sendEmailAlternative = async (
       port: 587,
       secure: false,
       auth: {
-        user: process.env.EMAIL_USER || 'sohagali.ru.ac@gmail.com',
-        pass: process.env.EMAIL_PASS || 'game issn revh mzcw',
+        user: config.email_sender_user,
+        pass: config.email_sender_pass,
       },
       connectionTimeout: 10000,
     })
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER || 'sohagali.ru.ac@gmail.com',
+      from: config.email_sender_user,
       to: email,
       subject: subject,
       text: text,

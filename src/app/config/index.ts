@@ -34,4 +34,6 @@ export default {
     ssl_payment_api: process.env.SSL_PAYMENT_API,
     ssl_validation_api: process.env.SSL_VALIDATION_API,
   },
+  email_sender_user: process.env.EMAIL_SENDER_USER,
+  email_sender_pass: process.env.EMAIL_SENDER_PASS,
 }
