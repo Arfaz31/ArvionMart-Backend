@@ -7,7 +7,7 @@ let activeUsers: Array<{ userId: string; socketId: string; role: string }> = []
 export const socketServer = (server: HttpServer) => {
   const io = new SocketIOServer(server, {
     cors: {
-      origin: 'http://localhost:3000',
+      origin: ['http://localhost:3000', 'https://arvionmart.vercel.app'],
       methods: ['GET', 'POST'],
     },
   })
