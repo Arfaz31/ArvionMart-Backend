@@ -1,5 +1,3 @@
-// /src/app/modules/Chat/chat.services.ts
-
 import mongoose from 'mongoose'
 import httpStatus from 'http-status'
 import { AppError } from '../../Error/AppError'
@@ -27,7 +25,6 @@ const getOrCreateChatForCustomer = async (customerId: string) => {
     {
       $match: { _id: chat._id },
     },
-
     {
       $lookup: {
         from: 'users',
@@ -36,7 +33,6 @@ const getOrCreateChatForCustomer = async (customerId: string) => {
         as: 'customerUser',
       },
     },
-
     {
       $lookup: {
         from: 'customers',
@@ -45,7 +41,6 @@ const getOrCreateChatForCustomer = async (customerId: string) => {
         as: 'customerProfile',
       },
     },
-
     {
       $lookup: {
         from: 'users',
@@ -54,7 +49,6 @@ const getOrCreateChatForCustomer = async (customerId: string) => {
         as: 'adminUser',
       },
     },
-
     {
       $lookup: {
         from: 'admins',
@@ -63,7 +57,6 @@ const getOrCreateChatForCustomer = async (customerId: string) => {
         as: 'adminProfile',
       },
     },
-
     {
       $unwind: { path: '$customerUser', preserveNullAndEmptyArrays: true },
     },
@@ -76,7 +69,6 @@ const getOrCreateChatForCustomer = async (customerId: string) => {
     {
       $unwind: { path: '$adminProfile', preserveNullAndEmptyArrays: true },
     },
-
     {
       $project: {
         _id: 1,
@@ -109,10 +101,13 @@ const getOrCreateChatForCustomer = async (customerId: string) => {
   return chatDetails[0]
 }
 
-const getAllChatsForAdmin = async () => {
+const getAllChatsForAdmin = async (page: number = 1, limit: number = 20) => {
+  const skip = (page - 1) * limit
+
   const chats = await Chat.aggregate([
     { $sort: { updatedAt: -1 } },
-
+    { $skip: skip },
+    { $limit: limit },
     {
       $lookup: {
         from: 'users',
@@ -135,7 +130,6 @@ const getAllChatsForAdmin = async () => {
     {
       $unwind: { path: '$customerProfile', preserveNullAndEmptyArrays: true },
     },
-
     {
       $project: {
         _id: 1,
@@ -152,7 +146,19 @@ const getAllChatsForAdmin = async () => {
       },
     },
   ])
-  return chats
+
+  const total = await Chat.countDocuments()
+  const hasMore = skip + limit < total
+
+  return {
+    data: chats,
+    pagination: {
+      page,
+      limit,
+      total,
+      hasMore,
+    },
+  }
 }
 
 export const ChatServices = {

@@ -9,6 +9,7 @@ import { User } from '../modules/User/user.model'
 const auth = (...roles: (keyof typeof UserRole)[]) => {
   return catchAsync(async (req, res, next) => {
     const token = req.headers.authorization
+    // console.log('token-from-frontend-request', token)
 
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!')
@@ -21,6 +22,7 @@ const auth = (...roles: (keyof typeof UserRole)[]) => {
         config.jwt.jwt_access_secret as string
       ) as JwtPayload
     } catch (error) {
+      console.log('JWT verification error:', error)
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!')
     }
     const { email, role } = decoded

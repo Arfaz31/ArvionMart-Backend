@@ -8,10 +8,27 @@ import { IMessage } from './message.interface'
 import Message from './message.model'
 
 const addMessage = async (req: Request) => {
-  const payload: Partial<IMessage> = req.body
   const files = req.files as { [fieldname: string]: Express.Multer.File[] }
+  // console.log('🔍 Debugging:')
+  // console.log('req.body:', req.body)
+  // console.log('req.files:', req.files)
+  // console.log('files variable:', files)
+  // Parse data from FormData (sent as JSON string)
+  let payload: Partial<IMessage> = {}
+  if (req.body.data) {
+    try {
+      payload = JSON.parse(req.body.data)
+    } catch (error) {
+      payload = req.body // fallback to direct body
+    }
+  } else {
+    payload = req.body
+  }
 
   const { chatId, senderId, text } = payload
+
+  console.log('payload', payload)
+  console.log('files', files)
 
   if (!chatId || !senderId) {
     throw new AppError(
@@ -20,11 +37,20 @@ const addMessage = async (req: Request) => {
     )
   }
 
-  if (!text && (!files || !files['images'] || files['images'].length === 0)) {
+  // Check করুন: text আছে কিনা বা files আছে কিনা
+  const hasText = text && text.trim().length > 0
+  const hasFiles = files && files['images'] && files['images'].length > 0
+
+  if (!hasText && !hasFiles) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'Message must contain text or images.'
     )
+  }
+
+  const sender = await User.findById(senderId)
+  if (!sender) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Sender not found')
   }
 
   try {
@@ -38,15 +64,17 @@ const addMessage = async (req: Request) => {
       senderId: new mongoose.Types.ObjectId(senderId as unknown as string),
     }
 
-    if (text) {
-      messageData.text = text
+    // Text add করুন যদি থাকে
+    if (hasText) {
+      messageData.text = text!.trim()
     }
 
-    if (files && files['images'] && files['images'].length > 0) {
+    // Images add করুন যদি থাকে
+    if (hasFiles) {
       messageData.imageUrls = files['images'].map(file => file.path)
     }
 
-    const sender = await User.findById(senderId)
+    // Admin assignment check করুন
     if (
       sender &&
       (sender.role === 'admin' || sender.role === 'superAdmin') &&
@@ -56,17 +84,19 @@ const addMessage = async (req: Request) => {
       chat.status = 'In-Progress'
     }
 
+    // Message create করুন
     const newMessage = await Message.create(messageData)
 
-    if (text) {
-      chat.lastMessage = text
+    // Chat এর lastMessage update করুন
+    if (hasText) {
+      chat.lastMessage = text!.trim()
     } else if (messageData.imageUrls && messageData.imageUrls.length > 0) {
       chat.lastMessage = `${messageData.imageUrls.length} image(s) sent`
     }
 
     await chat.save()
 
-    // FIXED: Use aggregation to properly populate sender info
+    // Populated message return করুন
     const populatedMessage = await Message.aggregate([
       { $match: { _id: newMessage._id } },
       {
@@ -133,12 +163,12 @@ const addMessage = async (req: Request) => {
 }
 
 const addMessageFromSocket = async (payload: any) => {
-  const { chatId, senderId, text, imageUrls } = payload
+  const { chatId, senderId, text } = payload
 
-  if (!chatId || !senderId) {
+  if (!chatId || !senderId || !text) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'Chat ID and Sender ID are required'
+      'Chat ID, Sender ID, and text are required'
     )
   }
 
@@ -146,25 +176,18 @@ const addMessageFromSocket = async (payload: any) => {
     const messageData: Partial<IMessage> = {
       chatId: new mongoose.Types.ObjectId(chatId),
       senderId: new mongoose.Types.ObjectId(senderId),
-    }
-
-    if (text) {
-      messageData.text = text
-    }
-
-    if (imageUrls && imageUrls.length > 0) {
-      messageData.imageUrls = imageUrls
+      text: text.trim(),
     }
 
     const newMessage = await Message.create(messageData)
 
     // Update chat last message
     await Chat.findByIdAndUpdate(chatId, {
-      lastMessage: text || `${imageUrls?.length || 0} image(s) sent`,
+      lastMessage: text.trim(),
       updatedAt: new Date(),
     })
 
-    // FIXED: Use aggregation to properly populate sender info
+    // Get populated message
     const populatedMessage = await Message.aggregate([
       { $match: { _id: newMessage._id } },
       {
@@ -201,7 +224,6 @@ const addMessageFromSocket = async (payload: any) => {
           _id: 1,
           chatId: 1,
           text: 1,
-          imageUrls: 1,
           createdAt: 1,
           updatedAt: 1,
           senderId: '$senderInfo._id',
@@ -230,14 +252,18 @@ const addMessageFromSocket = async (payload: any) => {
   }
 }
 
-const getMessages = async (chatId: string, page: number, limit: number) => {
+const getMessages = async (
+  chatId: string,
+  page: number = 1,
+  limit: number = 20
+) => {
   const pageNumber = page || 1
   const messageLimit = limit || 20
   const skip = (pageNumber - 1) * messageLimit
 
   const messages = await Message.aggregate([
     { $match: { chatId: new mongoose.Types.ObjectId(chatId) } },
-    { $sort: { createdAt: 1 } },
+    { $sort: { createdAt: -1 } }, // Latest first
     { $skip: skip },
     { $limit: messageLimit },
     {
@@ -292,8 +318,9 @@ const getMessages = async (chatId: string, page: number, limit: number) => {
         },
       },
     },
-  ])
+  ]).sort({ createdAt: 1 })
 
+  // Reverse to show oldest first in UI
   return messages
 }
 
