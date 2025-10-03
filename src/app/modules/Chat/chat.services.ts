@@ -148,6 +148,7 @@ const getAllChatsForAdmin = async (page: number = 1, limit: number = 20) => {
   ])
 
   const total = await Chat.countDocuments()
+  const totalPage = Math.ceil(total / limit)
   const hasMore = skip + limit < total
 
   return {
@@ -156,6 +157,7 @@ const getAllChatsForAdmin = async (page: number = 1, limit: number = 20) => {
       page,
       limit,
       total,
+      totalPage,
       hasMore,
     },
   }
