@@ -3,13 +3,16 @@ import express, { Application } from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
-// import rateLimit from 'express-rate-limit'
+import rateLimit from 'express-rate-limit'
 import middlewareRoutes from './app/routes'
 import globalErrorHandler from './app/middleware/globalErrorHandler'
 import { notFoundRoutes } from './app/middleware/notFoundRoutes'
 import { PaymentController } from './app/modules/Payment/payment.controller'
 
 const app: Application = express()
+
+// Trust proxy for rate limiting
+app.set('trust proxy', 1)
 
 // Middleware Setup
 app.use(express.json())
@@ -32,14 +35,14 @@ app.use(
 app.use(helmet())
 
 // 1. Rate Limiting
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 200,
-//   message: 'Too many requests from this IP, please try again after 15 minutes.',
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// })
-// app.use(limiter)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  message: 'Too many requests from this IP, please try again after 15 minutes.',
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+app.use(limiter)
 
 // Routes
 app.use('/api/v1', middlewareRoutes)
