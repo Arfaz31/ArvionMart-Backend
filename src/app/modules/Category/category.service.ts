@@ -9,6 +9,13 @@ import { SecondarySubcategory } from '../SecondarySubcategory/SecondarySubcatego
 import { Brand } from '../Brand/brand.model'
 import { clearCategoryCache, clearSidebarCache } from '../../redis/clearCache'
 import { getOrSetCache } from '../../redis/cache'
+import { Product } from '../Product/product.model'
+import { Banner } from '../Banner/banner.model'
+import { Blog } from '../Blogs/blog.model'
+import { PromoCard } from '../PromoCard/promoCard.model'
+import { PromotionalBanner } from '../PromotionalBanner/promotionalBanner.model'
+import { SideBanner } from '../SideBanner/sidebanner.model'
+import { Story } from '../Story/story.model'
 
 const createCategory = async (req: Request) => {
   const payload = req.body
@@ -140,6 +147,109 @@ const updateCategory = async (req: Request) => {
 
 const deleteCategory = async (id: string) => {
   const _id = id
+
+  // Check if any brands exist with this category
+  const brandsCount = await Brand.countDocuments({
+    category: _id,
+    isDeleted: false,
+  })
+  if (brandsCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete category. Brands are associated with this category.'
+    )
+  }
+
+  // Check if any subcategories exist with this category
+  const subcategoriesCount = await Subcategory.countDocuments({
+    category: _id,
+    isDeleted: false,
+  })
+  if (subcategoriesCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete category. Subcategories are associated with this category.'
+    )
+  }
+
+  // Check if any products exist with this category (assuming Product model exists)
+  const productsCount = await Product.countDocuments({
+    category: _id,
+    isDeleted: false,
+  })
+  if (productsCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete category. Products are associated with this category.'
+    )
+  }
+
+  const bannerCount = await Banner.countDocuments({
+    categoryId: _id,
+    isDeleted: false,
+  })
+  if (bannerCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete category. Banners are associated with this category.'
+    )
+  }
+
+  const blogCount = await Blog.countDocuments({
+    category: _id,
+    isDeleted: false,
+  })
+  if (blogCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete category. Blogs are associated with this category.'
+    )
+  }
+
+  const promoCardCount = await PromoCard.countDocuments({
+    categoryId: _id,
+    isDeleted: false,
+  })
+  if (promoCardCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete category. Promos are associated with this category.'
+    )
+  }
+
+  const promotionalBannerCount = await PromotionalBanner.countDocuments({
+    categoryId: _id,
+    isDeleted: false,
+  })
+  if (promotionalBannerCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete category. Promotional Banners are associated with this category.'
+    )
+  }
+
+  const sideBannerCount = await SideBanner.countDocuments({
+    categoryId: _id,
+    isDeleted: false,
+  })
+  if (sideBannerCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete category. Side Banners are associated with this category.'
+    )
+  }
+
+  const storyCount = await Story.countDocuments({
+    categoryId: _id,
+    isDeleted: false,
+  })
+  if (storyCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete category. Stories are associated with this category.'
+    )
+  }
+
   const result = await Category.findByIdAndDelete(_id)
   await clearCategoryCache(_id)
   await clearSidebarCache()

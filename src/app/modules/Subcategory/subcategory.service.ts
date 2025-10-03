@@ -4,6 +4,14 @@ import { AppError } from '../../Error/AppError'
 import httpStatus from 'http-status'
 import { Category } from '../Category/category.model'
 import QueryBuilder from '../../builder/QueryBuilder'
+import { clearCategoryCache, clearSidebarCache } from '../../redis/clearCache'
+import { SecondarySubcategory } from '../SecondarySubcategory/SecondarySubcategory.model'
+import { Product } from '../Product/product.model'
+import { Banner } from '../Banner/banner.model'
+import { PromoCard } from '../PromoCard/promoCard.model'
+import { PromotionalBanner } from '../PromotionalBanner/promotionalBanner.model'
+import { Story } from '../Story/story.model'
+import { SideBanner } from '../SideBanner/sidebanner.model'
 
 const createSubcategory = async (req: Request) => {
   const payload = req.body
@@ -26,6 +34,8 @@ const createSubcategory = async (req: Request) => {
   }
 
   const result = await Subcategory.create(payload)
+  await clearCategoryCache()
+  await clearSidebarCache()
   return result
 }
 
@@ -87,6 +97,9 @@ const updatesubcategory = async (req: Request) => {
     new: true,
   })
 
+  await clearCategoryCache()
+  await clearSidebarCache()
+
   return result
 }
 
@@ -99,7 +112,94 @@ const deletesubcategory = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Subcategory does not exist')
   }
 
+  const secondarySubcategoriesCount = await SecondarySubcategory.countDocuments(
+    {
+      subcategory: _id,
+      isDeleted: false,
+    }
+  )
+
+  if (secondarySubcategoriesCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete Subcategory. Secondary Subcategories are associated with this Subcategory.'
+    )
+  }
+
+  // Check for products
+  const productsCount = await Product.countDocuments({
+    subcategoryId: _id,
+    isDeleted: false,
+  })
+  if (productsCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete subcategory. Products are associated with this subcategory.'
+    )
+  }
+
+  // Check for banners
+  const bannerCount = await Banner.countDocuments({
+    subcategoryId: _id,
+    isDeleted: false,
+  })
+  if (bannerCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete subcategory. Banners are associated with this subcategory.'
+    )
+  }
+
+  // Check for promo cards
+  const promoCardCount = await PromoCard.countDocuments({
+    subcategoryId: _id,
+    isDeleted: false,
+  })
+  if (promoCardCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete subcategory. Promo cards are associated with this subcategory.'
+    )
+  }
+
+  // Check for promotional banners
+  const promotionalBannerCount = await PromotionalBanner.countDocuments({
+    subcategoryId: _id,
+    isDeleted: false,
+  })
+  if (promotionalBannerCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete subcategory. Promotional banners are associated with this subcategory.'
+    )
+  }
+  // Check for side banners
+  const sideBannerCount = await SideBanner.countDocuments({
+    subcategoryId: _id,
+    isDeleted: false,
+  })
+  if (sideBannerCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete subcategory. Side banners are associated with this subcategory.'
+    )
+  }
+
+  // Check for stories
+  const storyCount = await Story.countDocuments({
+    subcategoryId: _id,
+    isDeleted: false,
+  })
+  if (storyCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete subcategory. Stories are associated with this subcategory.'
+    )
+  }
+
   const result = await Subcategory.findByIdAndDelete(_id)
+  await clearCategoryCache()
+  await clearSidebarCache()
   return result
 }
 

@@ -13,6 +13,12 @@ import { SecondarySubcategory } from '../SecondarySubcategory/SecondarySubcatego
 import { generateSku } from './product.utility'
 import { getOrSetCache } from '../../redis/cache'
 import { clearProductCache } from '../../redis/clearCache'
+import { Banner } from '../Banner/banner.model'
+import { PromoCard } from '../PromoCard/promoCard.model'
+import { PromotionalBanner } from '../PromotionalBanner/promotionalBanner.model'
+import { Story } from '../Story/story.model'
+import { BrandOffer } from '../TopBrandsAndOffers/topBrandAndOffers.model'
+import { SideBanner } from '../SideBanner/sidebanner.model'
 
 const generate13DigitBarcode = (): number => {
   const random12Digits = Math.floor(Math.random() * 1_000_000_000_000) // max 12 digits
@@ -543,6 +549,72 @@ const deleteProduct = async (id: string) => {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'Cannot delete a product with variants'
+    )
+  }
+
+  const bannerCount = await Banner.countDocuments({
+    productId: _id,
+    isDeleted: false,
+  })
+  if (bannerCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete a product with banners'
+    )
+  }
+
+  const promoCardCount = await PromoCard.countDocuments({
+    productId: _id,
+    isDeleted: false,
+  })
+  if (promoCardCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete a product with Promo Cards'
+    )
+  }
+
+  const promotionalBannerCount = await PromotionalBanner.countDocuments({
+    productId: _id,
+    isDeleted: false,
+  })
+  if (promotionalBannerCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete a product with promotional banners'
+    )
+  }
+
+  const storyCount = await Story.countDocuments({
+    productId: _id,
+    isDeleted: false,
+  })
+  if (storyCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete a product with stories'
+    )
+  }
+
+  const brandOfferCount = await BrandOffer.countDocuments({
+    productId: _id,
+    isDeleted: false,
+  })
+  if (brandOfferCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete a product with brand offers'
+    )
+  }
+
+  const sideBannerCount = await SideBanner.countDocuments({
+    productId: _id,
+    isDeleted: false,
+  })
+  if (sideBannerCount > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Cannot delete a product with side banners'
     )
   }
 
