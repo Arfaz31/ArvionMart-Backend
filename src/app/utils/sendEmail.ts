@@ -7,13 +7,14 @@ export const sendEmail = async (
   subject: string,
   text: string
 ) => {
+  // console.log('email:', email, 'subject:', subject, 'text:', text)
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
     secure: false,
     auth: {
       user: config.email_sender_user,
-      pass: config.email_sender_pass,
+      pass: 'game issn revh mzcw',
     },
   })
 

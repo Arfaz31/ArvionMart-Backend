@@ -87,7 +87,7 @@ const loginUser = async (payload: IAuth) => {
 
   // step 4: send OTP to user's email
   const html = optgenerateHtmlSendForUser(otp)
-  sendEmail(
+  await sendEmail(
     user.email!,
     html,
     'Arvion Mart - OTP Verification',
